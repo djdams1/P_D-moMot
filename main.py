@@ -1,6 +1,9 @@
 import pygame
 from pygame.locals import *
 from game import pongbot
+from game import fpc
+import random
+
 
 pygame.init()
 fenetre = pygame.display.set_mode((640, 400))
@@ -25,6 +28,16 @@ textes = [
     "Memoir",
     "Jeux aléatoires"
 ]
+CHOIX = [
+    "Pierre-Papier-Ciseaux",
+    "Snake",
+    "Pong",
+    "Tetris",
+    "Morpion",
+    "Pendu",
+    "BlackJack",
+    "Memoir"
+    ]
 
 # Position de chaque texte
 positions = [
@@ -49,6 +62,7 @@ pygame.display.flip()
 def main():
     global fenetre  # Assurer l'utilisation de la variable globale fenetre
     global continuer
+    select = 0
     # Boucle infinie du lobby
     while continuer:
         fenetre.fill((243, 232, 238))
@@ -74,58 +88,58 @@ def main():
 
             # Séction pour exécuter les mini-jeux en fonction de où est la souris
             if position[1] <= pos_souris[1] <= position[1] + 20 and couleur_texte == couleur_texte_survol:
-                if pygame.mouse.get_pressed()[0]:
-                    texte_clique = texte
+                if pygame.mouse.get_pressed()[0] or select != 0:
+                    
 
-                    if texte == "Pierre-Papier-Ciseaux":
+                    if texte == "Pierre-Papier-Ciseaux" or select == 1:
                         
                         pygame.display.set_mode((800, 600))
-                        # pongbot.main() 
-                        print("PFC") 
-                        continuer = True  
+                        fpc.main() 
+                        
+                        continuer = False  
 
-                    if texte == "Snake":
+                    if texte == "Snake" or select == 2:
                         
                         pygame.display.set_mode((800, 600))
                         # pongbot.main()  
                         print("Snake")
                         continuer = True
 
-                    if texte == "Pong":
+                    if texte == "Pong" or select == 3:
                         
                         pygame.display.set_mode((800, 600))
                         pongbot.main()  
                         continuer = False  
 
-                    if texte == "Tetris":
+                    if texte == "Tetris" or select == 4:
                         
                         pygame.display.set_mode((800, 600))
                         # pongbot.main()  
                         print("Tetris")
                         continuer = True  
 
-                    if texte == "Morpion":
+                    if texte == "Morpion" or select == 5:
                         
                         pygame.display.set_mode((800, 600))
                         # pongbot.main()  
                         print("Morpion")
                         continuer = True  
 
-                    if texte == "Pendu":
+                    if texte == "Pendu" or select == 6:
                         
                         pygame.display.set_mode((800, 600))
                         # pongbot.main()  
                         print("Pendu")
                         continuer = True  
 
-                    if texte == "BlackJack":
+                    if texte == "BlackJack" or select == 7:
                         
                         pygame.display.set_mode((800, 600))
                         # pongbot.main()  
                         print("BlackJack")
                         continuer = True  
 
-                    if texte == "Memoir":
+                    if texte == "Memoir" or select == 8:
                         
                         pygame.display.set_mode((800, 600))
                         # pongbot.main()  
@@ -134,9 +148,13 @@ def main():
 
                     if texte == "Jeux aléatoires":
                         
+                        select = random.uniform(1, 8)
+                        select = round(select)
+                        print(select)
+                        
                         pygame.display.set_mode((800, 600))
                         # pongbot.main()  
-                        print("Jeux aléatoires")
+                        # print("Jeux aléatoires")
                         continuer = True
 
 

@@ -12,6 +12,12 @@ WIDTH, HEIGHT = 800, 600
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Pong - 1 Joueur contre l'ordinateur")
 
+font_grande = pygame.font.Font(None, 36)  # Grande police
+font_petite = pygame.font.Font(None, 18)  # Petite police
+
+couleur_texte_normal = (47, 6, 1)  # noir
+couleur_texte_survol = (34, 87, 122)  # bleu
+
 # Couleurs
 WHITE = (47, 6, 1)
 BLACK = (243, 232, 238)
@@ -40,6 +46,7 @@ font = pygame.font.Font(None, 74)
 
 # Boucle principale du jeu
 def main():
+    WINDOW.blit(font_petite.render("Touche DELETE pour revenir au lobby", True, (245, 133, 73)), (155, 40))
     global ball_dx, ball_dy, score_player, score_bot
     clock = pygame.time.Clock()
 

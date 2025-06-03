@@ -7,57 +7,101 @@ import subprocess
 # Initialiser pygame
 pygame.init()
 
-font_grande = pygame.font.Font(None, 36)  # Grande police
-font_petite = pygame.font.Font(None, 18)  # Petite police
 
-couleur_texte_normal = (47, 6, 1)  # noir
-couleur_texte_survol = (34, 87, 122)  # bleu
-couleur_fond =(243, 232, 238)
+def checkwin(choix_humain, fenetre, couleur_fond, efface_text, CHOIX, couleur_texte_normal, font_grande):
+    pygame.draw.rect(fenetre, couleur_fond, efface_text)  # Effacer la zone du texte
 
-fenetre = pygame.display.set_mode((800, 600))
+    choix_pc = random.choice(CHOIX)
 
-fenetre.fill(couleur_fond)
-pygame.display.flip()
+    # Debug
+    print("choix Homme :" + choix_humain + " Choix PC :" + choix_pc)
 
+    if (choix_pc == "Pierre" and choix_humain == "Pierre") or \
+            (choix_pc == "Papier" and choix_humain == "Papier") or \
+            (choix_pc == "Ciseaux" and choix_humain == "Ciseaux"):
+        # C'est un match nul
+        fenetre.blit(font_grande.render("Match nul ! l'ordinateur a choisi " + choix_pc, True, couleur_texte_normal), (155, 80))
 
-CHOIX = ["Pierre","Papier","Ciseaux"]
+    elif (choix_pc == "Pierre" and choix_humain == "Papier") or \
+            (choix_pc == "Papier" and choix_humain == "Ciseaux") or \
+            (choix_pc == "Ciseaux" and choix_humain == "Pierre"):
+        # L'humain a gagné
+        fenetre.blit(font_grande.render("Tu as gagné ! l'ordinateur a choisi " + choix_pc, True, couleur_texte_normal), (155, 80))
 
-
-
-pygame.draw.rect(fenetre, couleur_texte_normal,[150, 150, 70, 70])
-pygame.draw.rect(fenetre, couleur_texte_normal,[250, 150, 70, 70])
-pygame.draw.rect(fenetre, couleur_texte_normal,[350, 150, 70, 70])
-
-fenetre.blit(font_petite.render("Pierre", True, couleur_fond), (165, 180))
-fenetre.blit(font_petite.render("Papier", True, couleur_fond), (265, 180))
-fenetre.blit(font_petite.render("Ciseaux", True, couleur_fond), (360, 180))
-
+    elif (choix_pc == "Pierre" and choix_humain == "Ciseaux") or \
+            (choix_pc == "Papier" and choix_humain == "Pierre") or \
+            (choix_pc == "Ciseaux" and choix_humain == "Papier"):
+        # L'ordinateur a gagné
+        fenetre.blit(font_grande.render("L'ordinateur a gagné ! il a choisi " + choix_pc, True, couleur_texte_normal), (155, 80))
+    else:
+        fenetre.blit(font_grande.render("Appuies sur un des choix", True, couleur_texte_normal), (155, 80))
 
 
 def main():
-    fenetre.blit(font_grande.render("Pierre-Papier-Ciseaux", True, couleur_texte_normal), (155, 10))
-    
-    
+    font_grande = pygame.font.Font(None, 36)  # Grande police
+    font_petite = pygame.font.Font(None, 18)  # Petite police
+
+    couleur_texte_normal = (47, 6, 1)  # noir
+    couleur_texte_survol = (34, 87, 122)  # bleu
+    couleur_fond = (243, 232, 238)
+
+    fenetre = pygame.display.set_mode((800, 600))
+
+    CHOIX = ["Pierre", "Papier", "Ciseaux"]
+
+    # Positions des boutons
+    rect_pierre = pygame.Rect(155, 150, 70, 70)
+    rect_papier = pygame.Rect(255, 150, 70, 70)
+    rect_ciseaux = pygame.Rect(355, 150, 70, 70)
+    efface_text = pygame.Rect(150, 75, 600, 50)
+
+    # Dessiner les boutons et texte à chaque lancement
+    def dessiner_elements():
+        fenetre.fill(couleur_fond)  # Effacer toute la fenêtre avec la couleur de fond
+        pygame.draw.rect(fenetre, couleur_texte_normal, rect_pierre)
+        pygame.draw.rect(fenetre, couleur_texte_normal, rect_papier)
+        pygame.draw.rect(fenetre, couleur_texte_normal, rect_ciseaux)
+
+        fenetre.blit(font_petite.render("Pierre", True, couleur_fond), (170, 180))
+        fenetre.blit(font_petite.render("Papier", True, couleur_fond), (270, 180))
+        fenetre.blit(font_petite.render("Ciseaux", True, couleur_fond), (365, 180))
+
+        fenetre.blit(font_grande.render("Pierre-Papier-Ciseaux", True, couleur_texte_normal), (155, 10))
+        fenetre.blit(font_petite.render("Touche DELETE pour revenir au lobby", True, (245, 133, 73)), (155, 40))
+
+        pygame.display.flip()
+
+    # Initialiser la fenêtre avec les éléments
+    dessiner_elements()
+
     continuer = True
     while continuer:
-        
-        choix_pc = random.choice(CHOIX)
-        print(choix_pc)
-
-
-
-
-
         for event in pygame.event.get():
+            if event.type == MOUSEBUTTONDOWN and event.button == 1:  # Clic gauche de la souris
+                pos_souris = pygame.mouse.get_pos()
+
+                if rect_pierre.collidepoint(pos_souris):
+                    choix_humain = "Pierre"
+                elif rect_papier.collidepoint(pos_souris):
+                    choix_humain = "Papier"
+                elif rect_ciseaux.collidepoint(pos_souris):
+                    choix_humain = "Ciseaux"
+                else:
+                    choix_humain ="Miss"
+
+                checkwin(choix_humain, fenetre, couleur_fond, efface_text, CHOIX, couleur_texte_normal, font_grande)
+
+            # Fermer la fenêtre avec la touche DELETE ou la croix de la fenêtre
             if event.type == KEYDOWN and event.key == K_DELETE or event.type == pygame.QUIT:
                 continuer = False  
                 pygame.quit()
-                subprocess.run(["python", ".//main.py"])
+                subprocess.run(["python", ".//main.py"])  # Relancer le jeu
                 sys.exit()
 
-        pygame.display.update()  
+        pygame.display.update()
+
+    pygame.quit()
 
 
 if __name__ == "__main__":
     main()
-    pygame.quit()  
