@@ -3,6 +3,7 @@ from pygame.locals import *
 from game import pongbot
 from game import fpc
 from game import morpoin
+from game import pendu
 
 import random
 
@@ -20,7 +21,7 @@ couleur_texte_survol = (34, 87, 122)  # bleu
 # Textes
 textes = [
     "Bienvenue dans le lobby",
-    "Pierre-Papier-Ciseaux",
+    "Shi-Fu-Mi",
     "Snake",
     "Pong",
     "Tetris",
@@ -94,7 +95,7 @@ def main():
                 if pygame.mouse.get_pressed()[0] or select != 0:
                     
 
-                    if texte == "Pierre-Papier-Ciseaux" or select == 1:
+                    if texte == "Shi-Fu-Mi" or select == 1:
                         
                         pygame.display.set_mode((800, 600))
                         fpc.main() 
@@ -125,14 +126,12 @@ def main():
                         
                         pygame.display.set_mode((800, 600))
                         morpoin.main()  
-                        continuer = True  
+                        continuer = False  
 
                     if texte == "Pendu" or select == 6:
-                        
                         pygame.display.set_mode((800, 600))
-                        # pongbot.main()  
-                        print("Pendu")
-                        continuer = True  
+                        pendu.main()  
+                        continuer = False  
 
                     if texte == "BlackJack" or select == 7:
                         

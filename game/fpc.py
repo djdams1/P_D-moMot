@@ -66,7 +66,7 @@ def main():
         fenetre.blit(font_petite.render("Papier", True, couleur_fond), (270, 180))
         fenetre.blit(font_petite.render("Ciseaux", True, couleur_fond), (365, 180))
 
-        fenetre.blit(font_grande.render("Pierre-Papier-Ciseaux", True, couleur_texte_normal), (155, 10))
+        fenetre.blit(font_grande.render("Shi-Fu-Mi", True, couleur_texte_normal), (155, 10))
         fenetre.blit(font_petite.render("Touche DELETE pour revenir au lobby", True, (245, 133, 73)), (155, 40))
 
         pygame.display.flip()
