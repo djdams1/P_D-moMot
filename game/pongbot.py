@@ -25,9 +25,10 @@ BLACK = (243, 232, 238)
 # Vitesse des joueurs et de la balle
 PLAYER_SPEED = 5
 BALL_SPEED = 3
-BOT_REACTION_SPEED = 3  # Vitesse de réaction du bot (plus faible que celle du joueur)
-BOT_MISSED_CHANCE = 30  # Chance que le bot rate la balle
-BOT_HESITATION = 10  # Chance que le bot hésite
+BOT_REACTION_SPEED = 2  # Vitesse de réaction du bot (très lent)
+BOT_MISSED_CHANCE = 10  # Chance que le bot rate la balle, plus bas = plus de ratés
+BOT_HESITATION = 5  # Chance que le bot hésite (plus bas = plus d'hésitations)
+BOT_RANDOMNESS = 5  # Plus cette valeur est élevée, plus le mouvement du bot sera erratique
 
 # Dimensions des joueurs et de la balle
 PADDLE_WIDTH, PADDLE_HEIGHT = 20, 100
@@ -69,17 +70,23 @@ def main():
 
         # Mouvement erratique du bot : chance que le bot rate la balle
         if random.randint(0, BOT_MISSED_CHANCE) == 0:  # Chance que le bot rate la balle
-            bot.y += random.choice([-1, 1]) * BOT_REACTION_SPEED  # Déplacement erratique
+            bot.y += random.choice([-1, 1]) * random.randint(1, BOT_REACTION_SPEED)  # Déplacement erratique
 
-        # Hesitation du bot (aléatoire)
+        # Hésitation du bot (aléatoire) - plus de chances d'hésiter
         if random.randint(0, BOT_HESITATION) == 0:
             bot.y += random.choice([-1, 1]) * random.randint(1, BOT_REACTION_SPEED)  # Légère hésitation
 
-        # Le bot essaie de suivre la balle avec un délai
-        if bot.centery < ball.centery and bot.bottom < HEIGHT:
-            bot.y += BOT_REACTION_SPEED  # Le bot suit la balle vers le bas
-        elif bot.centery > ball.centery and bot.top > 0:
-            bot.y -= BOT_REACTION_SPEED  # Le bot suit la balle vers le haut
+        # Le bot essaie de suivre la balle mais de manière erratique et lente
+        if ball.centerx > WIDTH // 2:  # Le bot ne bouge que si la balle est dans sa moitié de terrain
+            # Réagir lentement à la balle
+            if random.randint(0, BOT_RANDOMNESS) == 0:  # Chance que le bot fasse un mouvement erratique
+                bot.y += random.choice([-1, 1]) * random.randint(1, BOT_REACTION_SPEED)  # Mouvement erratique
+
+            # Le bot suit la balle (mais très lentement et aléatoirement)
+            if bot.centery < ball.centery and bot.bottom < HEIGHT:
+                bot.y += BOT_REACTION_SPEED  # Le bot suit lentement la balle vers le bas
+            elif bot.centery > ball.centery and bot.top > 0:
+                bot.y -= BOT_REACTION_SPEED  # Le bot suit lentement la balle vers le haut
 
         # Déplacement de la balle
         ball.x += ball_dx

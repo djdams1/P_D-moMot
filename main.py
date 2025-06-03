@@ -28,6 +28,7 @@ textes = [
     "Memoir",
     "Jeux aléatoires"
 ]
+
 CHOIX = [
     "Pierre-Papier-Ciseaux",
     "Snake",
