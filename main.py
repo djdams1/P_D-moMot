@@ -2,6 +2,8 @@ import pygame
 from pygame.locals import *
 from game import pongbot
 from game import fpc
+from game import morpoin
+
 import random
 
 
@@ -122,8 +124,7 @@ def main():
                     if texte == "Morpion" or select == 5:
                         
                         pygame.display.set_mode((800, 600))
-                        # pongbot.main()  
-                        print("Morpion")
+                        morpoin.main()  
                         continuer = True  
 
                     if texte == "Pendu" or select == 6:
@@ -149,7 +150,7 @@ def main():
 
                     if texte == "Jeux aléatoires":
                         
-                        select = random.uniform(1, 8)
+                        select = random.uniform(0, 8)
                         select = round(select)
                         print(select)
                         

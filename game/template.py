@@ -20,17 +20,19 @@ pygame.display.flip()
 
 
 def main():
-    fenetre.blit(font_grande.render("Pierre-Papier-Ciseaux", True, couleur_texte_normal), (155, 10))
+    fenetre.blit(font_grande.render("Jeux Title", True, couleur_texte_normal), (155, 10))
+    fenetre.blit(font_petite.render("Touche DELETE pour revenir au lobby", True, (245, 133, 73)), (155, 40))
     
         
     continuer = True
     while continuer:
         for event in pygame.event.get():
-            if event.type == KEYDOWN and event.key == K_DELETE or event.type == pygame.QUIT:
-                continuer = False  
+            if event.type == KEYDOWN and event.key == K_DELETE:
                 pygame.quit()
                 subprocess.run(["python", ".//main.py"])
                 sys.exit()
+            elif event.type == pygame.QUIT:
+                pygame.quit()
 
         pygame.display.update()  
 

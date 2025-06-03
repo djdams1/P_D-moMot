@@ -26,9 +26,9 @@ BLACK = (243, 232, 238)
 PLAYER_SPEED = 5
 BALL_SPEED = 3
 BOT_REACTION_SPEED = 2  # Vitesse de réaction du bot (très lent)
-BOT_MISSED_CHANCE = 10  # Chance que le bot rate la balle, plus bas = plus de ratés
-BOT_HESITATION = 5  # Chance que le bot hésite (plus bas = plus d'hésitations)
-BOT_RANDOMNESS = 5  # Plus cette valeur est élevée, plus le mouvement du bot sera erratique
+BOT_MISSED_CHANCE = 5  # Chance que le bot rate la balle, plus bas = plus de ratés
+BOT_HESITATION = 10  # Chance que le bot hésite (plus bas = plus d'hésitations)
+BOT_RANDOMNESS = 10  # Plus cette valeur est élevée, plus le mouvement du bot sera erratique
 
 # Dimensions des joueurs et de la balle
 PADDLE_WIDTH, PADDLE_HEIGHT = 20, 100
@@ -54,10 +54,12 @@ def main():
     while True:
         # Gestion des événements
         for event in pygame.event.get():
-            if event.type == KEYDOWN and event.key == K_DELETE or event.type == pygame.QUIT:
+            if event.type == KEYDOWN and event.key == K_DELETE:
                 pygame.quit()
                 subprocess.run(["python", ".//main.py"])
                 sys.exit()
+            elif event.type == pygame.QUIT:
+                pygame.quit()
 
         # Gestion des touches (le joueur)
         keys = pygame.key.get_pressed()

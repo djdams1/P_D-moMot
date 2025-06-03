@@ -92,11 +92,13 @@ def main():
                 checkwin(choix_humain, fenetre, couleur_fond, efface_text, CHOIX, couleur_texte_normal, font_grande)
 
             # Fermer la fenêtre avec la touche DELETE ou la croix de la fenêtre
-            if event.type == KEYDOWN and event.key == K_DELETE or event.type == pygame.QUIT:
-                continuer = False  
+
+            if event.type == KEYDOWN and event.key == K_DELETE:
                 pygame.quit()
-                subprocess.run(["python", ".//main.py"])  # Relancer le jeu
+                subprocess.run(["python", ".//main.py"])
                 sys.exit()
+            elif event.type == pygame.QUIT:
+                pygame.quit()
 
         pygame.display.update()
 
