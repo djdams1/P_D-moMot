@@ -1,9 +1,9 @@
 import pygame
-import random
 import sys
+import random
+from pygame.locals import *
+import subprocess
 import os
-
-
 
 # Dimensions de la fenêtre
 SCREEN_WIDTH = 450  # Augmenté pour accueillir la section de score à droite
@@ -266,17 +266,20 @@ def main():
 
 
     # Lancer la musique de fonds
-    
-    while True:
-        if tetris.game_over:
-            # Si la partie est terminée, attendre que l'utilisateur appuie sur R pour recommencer
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    return  # Quitter le jeu
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_r:  # Appuyer sur "R" pour recommencer
-                        tetris.reset()  # Réinitialiser le jeu
+    continuer = True
+    while continuer:
+        
+        # Si la partie est terminée, attendre que l'utilisateur appuie sur R pour recommencer
+        for event in pygame.event.get():
+            if event.type == KEYDOWN and event.key == K_DELETE:
+                continuer = False
+                pygame.quit()
+                relancer_main()
+                sys.exit()
+            elif event.type == pygame.QUIT:
+                pygame.quit()
+            elif event.type == KEYDOWN and event.key == K_r:
+                tetris.reset()
 
         else:
             for event in pygame.event.get():
@@ -314,6 +317,17 @@ def main():
             # Limiter la vitesse du jeu
             clock.tick(60)
 
+def relancer_main():
+    # Détecte si on est dans un .exe (PyInstaller)
+    if getattr(sys, 'frozen', False):
+        base_path = os.path.dirname(sys.executable)
+        main_path = os.path.join(base_path, "main.exe")  # si compilé
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        main_path = os.path.abspath(os.path.join(base_path, "..", "main.py"))  # si .py
+    
+    subprocess.run([sys.executable, main_path])
+    sys.exit()
 
 if __name__ == "__main__":
     main()
