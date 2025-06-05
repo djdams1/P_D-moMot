@@ -35,20 +35,53 @@ COLOR_LIST = [
 
 # Formes de blocs
 SHAPES = [
+    # T-shape
     [[1, 1, 1],
-     [0, 1, 0]],  # T
+     [0, 1, 0]],
+    [[1, 1, 1],
+     [0, 1, 0]],
+    [[1, 1, 1],
+     [0, 1, 0]],
+
+    # O-shape (carré)
     [[1, 1],
-     [1, 1]],      # O
+     [1, 1]],
+    [[1, 1],
+     [1, 1]],
+
+    # S-shape
     [[1, 1, 0],
-     [0, 1, 1]],   # S
+     [0, 1, 1]],
+    [[1, 1, 0],
+     [0, 1, 1]],
+
+    # Z-shape
     [[0, 1, 1],
-     [1, 1, 0]],   # Z
+     [1, 1, 0]],
+    [[0, 1, 1],
+     [1, 1, 0]],
+
+    # L-shape
     [[1, 0, 0],
-     [1, 1, 1]],   # L
+     [1, 1, 1]],
+    [[1, 0, 0],
+     [1, 1, 1]],
+    [[1, 0, 0],
+     [1, 1, 1]],
+
+    # J-shape
     [[0, 0, 1],
-     [1, 1, 1]],   # J
-    [[1, 1, 1, 1]]  # I
+     [1, 1, 1]],
+    [[0, 0, 1],
+     [1, 1, 1]],
+
+    # I-shape
+    [[1, 1, 1, 1]],
+    [[1, 1, 1, 1]],
+    [[1, 1, 1, 1]],
+    [[1, 1, 1, 1]],
 ]
+
 
 # Classe pour la gestion du jeu
 # Dans la classe Tetris, lors du chargement des textures des blocs
@@ -268,18 +301,18 @@ def main():
     # Lancer la musique de fonds
     continuer = True
     while continuer:
-        
-        # Si la partie est terminée, attendre que l'utilisateur appuie sur R pour recommencer
-        for event in pygame.event.get():
-            if event.type == KEYDOWN and event.key == K_DELETE:
-                continuer = False
-                pygame.quit()
-                relancer_main()
-                sys.exit()
-            elif event.type == pygame.QUIT:
-                pygame.quit()
-            elif event.type == KEYDOWN and event.key == K_r:
-                tetris.reset()
+        if tetris.game_over:
+            # Si la partie est terminée, attendre que l'utilisateur appuie sur R pour recommencer
+            for event in pygame.event.get():
+                if event.type == KEYDOWN and event.key == K_DELETE:
+                    continuer = False
+                    pygame.quit()
+                    relancer_main()
+                    sys.exit()
+                elif event.type == pygame.QUIT:
+                    pygame.quit()
+                elif event.type == KEYDOWN and event.key == K_r:
+                    tetris.reset()
 
         else:
             for event in pygame.event.get():
