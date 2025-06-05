@@ -44,9 +44,11 @@ ball_dx, ball_dy = BALL_SPEED, BALL_SPEED
 # Score
 score_player, score_bot = 0, 0
 font = pygame.font.Font(None, 74)
-continuer = True
+
 # Boucle principale du jeu
 def main():
+
+    continuer = True
     WINDOW.blit(font_petite.render("Touche DELETE pour revenir au lobby", True, (245, 133, 73)), (155, 40))
     global ball_dx, ball_dy, score_player, score_bot
     clock = pygame.time.Clock()
