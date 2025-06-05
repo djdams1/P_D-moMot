@@ -103,7 +103,7 @@ class Tetris:
         self.fall_speed = 500  # Temps avant que la pièce tombe
         self.last_fall_time = pygame.time.get_ticks()
         self.last_move_time = pygame.time.get_ticks()  # Temps pour gérer la répétition des actions
-        self.repeat_rate = 150  # Temps avant qu'une action répétée soit exécutée
+        self.repeat_rate = 50  # Temps avant qu'une action répétée soit exécutée
         self.move_left_pressed = False
         self.move_right_pressed = False
         self.move_down_pressed = False
@@ -148,7 +148,19 @@ class Tetris:
             self.current_position = [0, 4]
 
     def rotate_piece(self):
-        self.current_piece = [list(row) for row in zip(*self.current_piece[::-1])]
+        rotated = [list(row) for row in zip(*self.current_piece[::-1])]
+        if self.valid_position(rotated, self.current_position):
+            self.current_piece = rotated
+
+    def valid_position(self, piece, pos):
+        for y, row in enumerate(piece):
+            for x, cell in enumerate(row):
+                if cell:
+                    new_x = pos[1] + x
+                    new_y = pos[0] + y
+                    if new_x < 0 or new_x >= 10 or new_y < 0 or new_y >= 20 or self.board[new_y][new_x] is not None:
+                        return False
+        return True
 
     def valid_move(self, dx, dy):
         for y, row in enumerate(self.current_piece):
@@ -186,13 +198,14 @@ class Tetris:
 
     def clear_lines(self):
         lines_cleared = 0
-        for i in range(len(self.board)-1, -1, -1):  # Commencer par la dernière ligne
-            if all(cell is not None for cell in self.board[i]):  # Vérifie si la ligne est pleine
-                del self.board[i]  # Supprimer la ligne pleine
-                self.board.insert(0, [None] * 10)  # Insère une nouvelle ligne vide en haut
-                lines_cleared += 1  # Incrémente le nombre de lignes effacées
-                print(f"Line {i} cleared")
-
+        i = len(self.board) - 1
+        while i >= 0:
+            if all(cell is not None for cell in self.board[i]):
+                del self.board[i]
+                self.board.insert(0, [None] * 10)
+                lines_cleared += 1
+                continue  # Revérifie la même ligne insérée
+            i -= 1
         # Mettre à jour le score
         if lines_cleared > 0:
             self.score += lines_cleared * 100  # Ajoute 100 points par ligne supprimée
@@ -200,7 +213,7 @@ class Tetris:
         else:
             print("No lines cleared.")
             
-        self.debug_print_board()
+        
 
     def move_left(self):
         if self.valid_move(-1, 0):
@@ -225,7 +238,12 @@ class Tetris:
                 self.move_right()
             if self.move_down_pressed:
                 self.move_down()
-            self.last_move_time = current_time  # Met à jour le dernier temps d'action
+            self.last_move_time = current_time
+
+            # Vérifie que la position reste valide
+            if not self.valid_position(self.current_piece, self.current_position):
+                self.game_over = True
+
     def draw(self, screen):
         # Dessiner la partie gauche (jeu)
         for y, row in enumerate(self.board):
@@ -264,7 +282,7 @@ class Tetris:
         # Afficher "Game Over" si nécessaire
         if self.game_over:
             game_over_text = font.render("Game Over", True, WHITE)
-            screen.blit(game_over_text, (SCREEN_WIDTH - RIGHT_PANEL_WIDTH + 10, SCREEN_HEIGHT // 2))
+            screen.blit(game_over_text, (SCREEN_WIDTH - RIGHT_PANEL_WIDTH + 10, (SCREEN_HEIGHT // 2)+50 ))
 
 
 
@@ -283,10 +301,6 @@ class Tetris:
         self.last_fall_time = pygame.time.get_ticks()
         self.last_move_time = pygame.time.get_ticks()
 
-    def debug_print_board(self):
-        """Affiche le plateau pour le débogage"""
-        for row in self.board:
-            print(row)
 
 # Fonction principale
 def main():
