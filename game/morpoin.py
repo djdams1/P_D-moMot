@@ -122,7 +122,7 @@ def main():
                 sys.exit()
             elif event.type == KEYDOWN and event.key == K_DELETE:
                 pygame.quit()
-                subprocess.run(["python", ".//main.py"])
+                relancer_main()
                 sys.exit()
             elif event.type == MOUSEBUTTONDOWN and gagnant is None:  # bloquer clic si déjà gagné
                 pos = pygame.mouse.get_pos()
