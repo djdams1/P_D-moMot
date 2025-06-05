@@ -5,6 +5,7 @@ from pygame.locals import *
 import subprocess
 import os
 
+
 pygame.init()
 
 # Polices
@@ -33,21 +34,25 @@ game_over = False
 message = ""
 
 card_images = {}
-back_image = None  # Ajouté
 
+
+
+def resource_path(relative_path):
+    
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
+back_image = pygame.image.load(resource_path("game/cards/back.png"))
 
 def load_card_images():
     global card_images, back_image
     card_folder = "game/cards"
 
-    if not os.path.exists(card_folder):
-        print(f"❌ Le dossier '{card_folder}' n'existe pas !")
-        return
-
     for value in ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]:
         for suit in ["C", "D", "H", "S"]:
             name = f"{value}-{suit}"
-            path = os.path.join(card_folder, f"{name}.png")
+            path = resource_path(os.path.join(card_folder, f"{name}.png"))
             if os.path.isfile(path):
                 img = pygame.image.load(path).convert_alpha()
                 img = pygame.transform.scale(img, (71, 96))
@@ -56,7 +61,7 @@ def load_card_images():
                 print(f"⚠️ Image manquante : {name}.png")
 
     # Charger le dos de carte
-    back_path = os.path.join(card_folder, "back.png")
+    back_path = resource_path(os.path.join(card_folder, "back.png"))
     if os.path.isfile(back_path):
         back_image = pygame.image.load(back_path).convert_alpha()
         back_image = pygame.transform.scale(back_image, (71, 96))

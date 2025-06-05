@@ -4,6 +4,7 @@ from game import pongbot
 from game import fpc
 from game import morpoin
 from game import pendu
+from game import blackjack
 
 import random
 
@@ -135,8 +136,8 @@ def main():
                     if texte == "BlackJack" or select == 7:
                         
                         pygame.display.set_mode((800, 600))
-                        # pongbot.main()  
-                        print("BlackJack")
+                        blackjack.main()  
+                        
                         continuer = True  
 
                     if texte == "Memoir" or select == 8:
