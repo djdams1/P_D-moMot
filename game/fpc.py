@@ -98,7 +98,9 @@ def main():
                 subprocess.run(["python", ".//main.py"])
                 sys.exit()
             elif event.type == pygame.QUIT:
+                continuer = False
                 pygame.quit()
+                sys.exit()
 
         pygame.display.update()
 

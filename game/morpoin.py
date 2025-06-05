@@ -119,6 +119,7 @@ def main():
             if event.type == QUIT:
                 pygame.quit()
                 continuer = False
+                sys.exit()
             elif event.type == KEYDOWN and event.key == K_DELETE:
                 pygame.quit()
                 subprocess.run(["python", ".//main.py"])

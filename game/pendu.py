@@ -155,6 +155,7 @@ def main():
         for event in pygame.event.get():
             if event.type == QUIT:
                 continuer = False
+                sys.exit()
             elif event.type == KEYDOWN:
                 if event.key == K_DELETE:
                     pygame.quit()

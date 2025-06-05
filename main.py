@@ -138,7 +138,7 @@ def main():
                         pygame.display.set_mode((800, 600))
                         blackjack.main()  
                         
-                        continuer = True  
+                        continuer = False  
 
                     if texte == "Memoir" or select == 8:
                         

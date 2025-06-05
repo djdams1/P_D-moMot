@@ -44,22 +44,25 @@ ball_dx, ball_dy = BALL_SPEED, BALL_SPEED
 # Score
 score_player, score_bot = 0, 0
 font = pygame.font.Font(None, 74)
-
+continuer = True
 # Boucle principale du jeu
 def main():
     WINDOW.blit(font_petite.render("Touche DELETE pour revenir au lobby", True, (245, 133, 73)), (155, 40))
     global ball_dx, ball_dy, score_player, score_bot
     clock = pygame.time.Clock()
 
-    while True:
+    while continuer:
         # Gestion des événements
         for event in pygame.event.get():
             if event.type == KEYDOWN and event.key == K_DELETE:
+                
                 pygame.quit()
                 subprocess.run(["python", ".//main.py"])
                 sys.exit()
             elif event.type == pygame.QUIT:
+                continuer = False
                 pygame.quit()
+                sys.exit()
 
         # Gestion des touches (le joueur)
         keys = pygame.key.get_pressed()
