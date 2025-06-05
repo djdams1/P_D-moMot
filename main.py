@@ -5,6 +5,7 @@ from game import fpc
 from game import morpoin
 from game import pendu
 from game import blackjack
+from game import tetris
 
 import random
 
@@ -118,8 +119,7 @@ def main():
                     if texte == "Tetris" or select == 4:
                         
                         pygame.display.set_mode((800, 600))
-                        # pongbot.main()  
-                        print("Tetris")
+                        tetris.main()  
                         continuer = True  
 
                     if texte == "Morpion" or select == 5:
