@@ -99,7 +99,6 @@ def main():
                         
                         pygame.display.set_mode((800, 600))
                         fpc.main() 
-                        
                         continuer = False  
 
                     if texte == "Snake" or select == 2:
@@ -152,10 +151,6 @@ def main():
                         select = random.uniform(0, 8)
                         select = round(select)
                         print(select)
-                        
-                        pygame.display.set_mode((800, 600))
-                        # pongbot.main()  
-                        # print("Jeux aléatoires")
                         continuer = True
 
 

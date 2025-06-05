@@ -70,25 +70,24 @@ def main():
         if keys[pygame.K_s] and player.bottom < HEIGHT:
             player.y += PLAYER_SPEED
 
-        # Mouvement erratique du bot : chance que le bot rate la balle
-        if random.randint(0, BOT_MISSED_CHANCE) == 0:  # Chance que le bot rate la balle
-            bot.y += random.choice([-1, 1]) * random.randint(1, BOT_REACTION_SPEED)  # Déplacement erratique
+       
+        if random.randint(0, BOT_MISSED_CHANCE) == 0:  
+            bot.y += random.choice([-1, 1]) * random.randint(1, BOT_REACTION_SPEED)  
 
-        # Hésitation du bot (aléatoire) - plus de chances d'hésiter
+        
         if random.randint(0, BOT_HESITATION) == 0:
-            bot.y += random.choice([-1, 1]) * random.randint(1, BOT_REACTION_SPEED)  # Légère hésitation
-
-        # Le bot essaie de suivre la balle mais de manière erratique et lente
-        if ball.centerx > WIDTH // 2:  # Le bot ne bouge que si la balle est dans sa moitié de terrain
-            # Réagir lentement à la balle
-            if random.randint(0, BOT_RANDOMNESS) == 0:  # Chance que le bot fasse un mouvement erratique
-                bot.y += random.choice([-1, 1]) * random.randint(1, BOT_REACTION_SPEED)  # Mouvement erratique
+            bot.y += random.choice([-1, 1]) * random.randint(1, BOT_REACTION_SPEED)  
+        
+        if ball.centerx > WIDTH // 2:  
+            
+            if random.randint(0, BOT_RANDOMNESS) == 0:  
+                bot.y += random.choice([-1, 1]) * random.randint(1, BOT_REACTION_SPEED)  
 
             # Le bot suit la balle (mais très lentement et aléatoirement)
             if bot.centery < ball.centery and bot.bottom < HEIGHT:
-                bot.y += BOT_REACTION_SPEED  # Le bot suit lentement la balle vers le bas
+                bot.y += BOT_REACTION_SPEED  
             elif bot.centery > ball.centery and bot.top > 0:
-                bot.y -= BOT_REACTION_SPEED  # Le bot suit lentement la balle vers le haut
+                bot.y -= BOT_REACTION_SPEED  
 
         # Déplacement de la balle
         ball.x += ball_dx
