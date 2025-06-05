@@ -2,7 +2,7 @@ import pygame
 import sys
 import subprocess
 from pygame.locals import *
-
+import os
 
 # Initialisation
 pygame.init()
@@ -112,7 +112,7 @@ def main():
             # Après 3 secondes, quitter ou reset
             if pygame.time.get_ticks() - temps_fin > 3000:
                 pygame.quit()
-                subprocess.run(["python", ".//main.py"])
+                relancer_main()
                 sys.exit()
 
         for event in pygame.event.get():
@@ -138,6 +138,18 @@ def main():
                             temps_fin = pygame.time.get_ticks()  # démarre le chrono de la pause
 
         pygame.display.update()
+
+def relancer_main():
+    # Détecte si on est dans un .exe (PyInstaller)
+    if getattr(sys, 'frozen', False):
+        base_path = os.path.dirname(sys.executable)
+        main_path = os.path.join(base_path, "main.exe")  # si compilé
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        main_path = os.path.abspath(os.path.join(base_path, "..", "main.py"))  # si .py
+    
+    subprocess.run([sys.executable, main_path])
+    sys.exit()
 
 if __name__ == "__main__":
     main()

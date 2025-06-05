@@ -159,7 +159,7 @@ def main():
             elif event.type == KEYDOWN:
                 if event.key == K_DELETE:
                     pygame.quit()
-                    subprocess.run(["python", ".//main.py"])
+                    relancer_main()
                     sys.exit()
 
                 # Si partie en cours et une lettre (a-z)
@@ -208,6 +208,18 @@ def main():
         pygame.display.update()
 
     pygame.quit()
+
+def relancer_main():
+    # Détecte si on est dans un .exe (PyInstaller)
+    if getattr(sys, 'frozen', False):
+        base_path = os.path.dirname(sys.executable)
+        main_path = os.path.join(base_path, "main.exe")  # si compilé
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        main_path = os.path.abspath(os.path.join(base_path, "..", "main.py"))  # si .py
+    
+    subprocess.run([sys.executable, main_path])
+    sys.exit()
 
 if __name__ == "__main__":
     main()

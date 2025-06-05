@@ -3,7 +3,7 @@ import sys
 import random
 from pygame.locals import *
 import subprocess
-
+import os
 # Initialiser pygame
 pygame.init()
 
@@ -30,14 +30,25 @@ def main():
             if event.type == KEYDOWN and event.key == K_DELETE:
                 continuer = False
                 pygame.quit()
-                sys.exit()
-                subprocess.run(["python", ".//main.py"])
+                relancer_main()
                 sys.exit()
             elif event.type == pygame.QUIT:
                 pygame.quit()
 
         pygame.display.update()  
 
+
+def relancer_main():
+    # Détecte si on est dans un .exe (PyInstaller)
+    if getattr(sys, 'frozen', False):
+        base_path = os.path.dirname(sys.executable)
+        main_path = os.path.join(base_path, "main.exe")  # si compilé
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        main_path = os.path.abspath(os.path.join(base_path, "..", "main.py"))  # si .py
+    
+    subprocess.run([sys.executable, main_path])
+    sys.exit()
 
 if __name__ == "__main__":
     main()
