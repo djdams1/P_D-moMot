@@ -189,9 +189,18 @@ def main():
                             lettres_ratees.add(lettre)
                             nb_erreurs += 1
                             if nb_erreurs >= max_erreurs:
+                                lettres_trouvees.update(set(mot))  # Pour afficher le mot entier
                                 message_fin = f"Perdu ! Le mot était : {mot}"
-                                # Afficher le message immédiatement
+                                fenetre.fill(couleur_fond)
+                                fenetre.blit(font_grande.render("Pendu", True, couleur_texte_normal), (155, 10))
+                                mot_cache = afficher_mot_cache(mot, lettres_trouvees)
+                                texte_mot = font_moyenne.render(mot_cache, True, couleur_texte_normal)
+                                fenetre.blit(texte_mot, (155, 150))
+                                dessiner_pendu(nb_erreurs)
+                                pygame.display.update()
+                                pygame.time.wait(500)  # petite pause pour bien voir le pendu complet
                                 stopgame(message_fin)
+
 
                                 
                                 
