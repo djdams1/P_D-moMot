@@ -174,7 +174,17 @@ def main():
                             # Victoire ?
                             if all(l in lettres_trouvees for l in mot):
                                 message_fin = "Bravo, vous avez gagné !"
+                                # Redessine le mot complet avant de quitter
+                                fenetre.fill(couleur_fond)
+                                fenetre.blit(font_grande.render("Pendu", True, couleur_texte_normal), (155, 10))
+                                mot_cache = afficher_mot_cache(mot, lettres_trouvees)
+                                texte_mot = font_moyenne.render(mot_cache, True, couleur_texte_normal)
+                                fenetre.blit(texte_mot, (155, 150))
+                                dessiner_pendu(nb_erreurs)
+                                pygame.display.update()
+                                pygame.time.wait(500)  # petite pause pour que ça se voie
                                 stopgame(message_fin)
+
                         elif lettre not in mot:
                             lettres_ratees.add(lettre)
                             nb_erreurs += 1
