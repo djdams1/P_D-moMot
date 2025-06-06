@@ -234,6 +234,9 @@ def draw_hand(hand, x, y, reveal_all=True):
 def draw_screen():
    
     fenetre.fill((0, 128, 0))
+
+    fenetre.blit(font_petite.render("H pour piocher, S pour validé et R pour une nouvelle relancer", True, (245, 133, 73)), (50, 10))
+
     fenetre.blit(font_grande.render(f"Cash: ${yourcash}", True, (255, 255, 255)), (600, 20))
     fenetre.blit(font_grande.render(f"Bet: ${mise}", True, (255, 255, 255)), (600, 60))
     fenetre.blit(font_grande.render(f"Your Total: {yourSum}", True, (255, 255, 255)), (50, 350))

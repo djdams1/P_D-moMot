@@ -13,9 +13,8 @@ BLOCK_SIZE = 30
 
 
 def resource_path(relative_path):
-    """ Récupère le bon chemin des ressources (utile pour PyInstaller) """
     try:
-        base_path = sys._MEIPASS  # Utilisé par PyInstaller
+        base_path = sys._MEIPASS
     except AttributeError:
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
