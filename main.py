@@ -6,12 +6,13 @@ from game import morpoin
 from game import pendu
 from game import blackjack
 from game import tetris
+from game import pong2
 
 import random
 
 
 pygame.init()
-fenetre = pygame.display.set_mode((640, 400))
+fenetre = pygame.display.set_mode((640, 500))
 pygame.display.set_caption("Lobby Game")
 
 font_grande = pygame.font.Font(None, 36)  # Grande police
@@ -26,6 +27,7 @@ textes = [
     "Shi-Fu-Mi",
     "Snake",
     "Pong",
+    "Pong 1V1",
     "Tetris",
     "Morpion",
     "Pendu",
@@ -38,6 +40,7 @@ CHOIX = [
     "Pierre-Papier-Ciseaux",
     "Snake",
     "Pong",
+    "Pong1V1",
     "Tetris",
     "Morpion",
     "Pendu",
@@ -56,7 +59,8 @@ positions = [
     (155, 250),
     (155, 280),
     (155, 310),
-    (155, 370)
+    (155, 340),
+    (155, 470)
 ]
 
 continuer = True
@@ -147,9 +151,16 @@ def main():
                         print("Memoir")
                         continuer = True
 
+                    if texte == "Pong 1V1" or select == 9:
+                        
+                        pygame.display.set_mode((800, 600))
+                        pong2.main()  
+                        
+                        continuer = True
+
                     if texte == "Jeux aléatoires":
                         
-                        select = random.uniform(0, 8)
+                        select = random.uniform(0, 9)
                         select = round(select)
                         print(select)
                         continuer = True
