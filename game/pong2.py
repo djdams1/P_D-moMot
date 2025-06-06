@@ -1,6 +1,9 @@
 import pygame
 import sys
-
+import random
+from pygame.locals import *
+import subprocess
+import os
 # Initialiser pygame
 pygame.init()
 
@@ -18,8 +21,8 @@ BLACK = (243, 232, 238)
 WHITE = (47, 6, 1)
 
 # Vitesse des joueurs et de la balle
-PLAYER_SPEED = 10
-BALL_SPEED = 5
+PLAYER_SPEED = 13
+BALL_SPEED = 7
 
 # Dimensions des joueurs et de la balle
 PADDLE_WIDTH, PADDLE_HEIGHT = 20, 100
@@ -38,15 +41,23 @@ font = pygame.font.Font(None, 74)
 
 # Boucle principale du jeu
 def main():
+    
     global ball_dx, ball_dy, score1, score2
     clock = pygame.time.Clock()
 
-    while True:
-        # Gestion des événements
+    continuer = True
+    while continuer:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == KEYDOWN and event.key == K_DELETE:
+                continuer = False
                 pygame.quit()
+                relancer_main()
                 sys.exit()
+            elif event.type == pygame.QUIT:
+                pygame.quit()
+
+        pygame.display.update()
+
 
         # Gestion des touches
         keys = pygame.key.get_pressed()
@@ -99,6 +110,17 @@ def main():
         # Rafraîchir l'écran
         pygame.display.flip()
         clock.tick(60)
+def relancer_main():
+    # Détecte si on est dans un .exe (PyInstaller)
+    if getattr(sys, 'frozen', False):
+        base_path = os.path.dirname(sys.executable)
+        main_path = os.path.join(base_path, "main.exe")  # si compilé
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        main_path = os.path.abspath(os.path.join(base_path, "..", "main.py"))  # si .py
+    
+    subprocess.run([sys.executable, main_path])
+    sys.exit()
 
 # Réinitialiser la position de la balle
 def reset_ball():
