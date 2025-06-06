@@ -11,19 +11,15 @@ SCREEN_HEIGHT = 600
 BLOCK_SIZE = 30
 
 
-if getattr(sys, 'frozen', False):
-    # PyInstaller
-    BASE_PATH = sys._MEIPASS
-else:
-    BASE_PATH = os.path.dirname(__file__)
 
-TEXTURE_DIR = os.path.join(BASE_PATH, "textures")
+def resource_path(relative_path):
+    """ Récupère le bon chemin des ressources (utile pour PyInstaller) """
+    try:
+        base_path = sys._MEIPASS  # Utilisé par PyInstaller
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
-# Normaliser le chemin
-TEXTURE_DIR = os.path.normpath(TEXTURE_DIR)
-
-# Chargement de l'image
-# image = pygame.image.load(TEXTURE_DIR)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RIGHT_PANEL_COLOR = (50, 50, 50)  # Couleur de fond de la partie droite
@@ -114,28 +110,22 @@ class Tetris:
         
         # Charger les textures des blocs et les redimensionner pour la section "prochaine pièce"
         self.textures = {
-            (255, 0, 0): pygame.image.load("textures/red.png"),
-            (0, 255, 0): pygame.image.load("textures/green.png"),
-            (0, 0, 255): pygame.image.load("textures/bleu.png"),
-            (255, 255, 0): pygame.image.load("textures/yellow.png"),
-            (255, 165, 0): pygame.image.load("textures/orange.png"),
-            (0, 255, 255): pygame.image.load("textures/cyan.png"),
-            (128, 0, 128): pygame.image.load("textures/violet.png")
+            (255, 0, 0): pygame.image.load(resource_path("textures/red.png")),
+            (0, 255, 0): pygame.image.load(resource_path("textures/green.png")),
+            (0, 0, 255): pygame.image.load(resource_path("textures/bleu.png")),
+            (255, 255, 0): pygame.image.load(resource_path("textures/yellow.png")),
+            (255, 165, 0): pygame.image.load(resource_path("textures/orange.png")),
+            (0, 255, 255): pygame.image.load(resource_path("textures/cyan.png")),
+            (128, 0, 128): pygame.image.load(resource_path("textures/violet.png"))
         }
-        
         # Redimensionner les textures pour s'assurer qu'elles correspondent à la taille des blocs
         for key in self.textures:
             self.textures[key] = pygame.transform.scale(self.textures[key], (BLOCK_SIZE, BLOCK_SIZE))
-        
-        # Redimensionner les textures des prochaines pièces (plus petites pour l'affichage à droite)
+
+        # Redimensionner pour la preview des prochaines pièces
         self.next_piece_textures = {
-            (255, 0, 0): pygame.transform.scale(self.textures[(255, 0, 0)], (BLOCK_SIZE // 2, BLOCK_SIZE // 2)),
-            (0, 255, 0): pygame.transform.scale(self.textures[(0, 255, 0)], (BLOCK_SIZE // 2, BLOCK_SIZE // 2)),
-            (0, 0, 255): pygame.transform.scale(self.textures[(0, 0, 255)], (BLOCK_SIZE // 2, BLOCK_SIZE // 2)),
-            (255, 255, 0): pygame.transform.scale(self.textures[(255, 255, 0)], (BLOCK_SIZE // 2, BLOCK_SIZE // 2)),
-            (255, 165, 0): pygame.transform.scale(self.textures[(255, 165, 0)], (BLOCK_SIZE // 2, BLOCK_SIZE // 2)),
-            (0, 255, 255): pygame.transform.scale(self.textures[(0, 255, 255)], (BLOCK_SIZE // 2, BLOCK_SIZE // 2)),
-            (128, 0, 128): pygame.transform.scale(self.textures[(128, 0, 128)], (BLOCK_SIZE // 2, BLOCK_SIZE // 2))
+            color: pygame.transform.scale(self.textures[color], (BLOCK_SIZE // 2, BLOCK_SIZE // 2))
+            for color in self.textures
         }
 
 
