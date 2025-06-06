@@ -11,15 +11,19 @@ SCREEN_HEIGHT = 600
 BLOCK_SIZE = 30
 
 
-# Base : dossier actuel (tetris.py est dans /game)
-BASE_DIR = os.path.dirname(__file__)  # -> D:/DemoMotold/Prod/P_D-moMot/game
-TEXTURE_PATH = os.path.join(BASE_DIR, "../textures/red.png")  # remonter d’un dossier
+if getattr(sys, 'frozen', False):
+    # PyInstaller
+    BASE_PATH = sys._MEIPASS
+else:
+    BASE_PATH = os.path.dirname(__file__)
+
+TEXTURE_DIR = os.path.join(BASE_PATH, "textures")
 
 # Normaliser le chemin
-TEXTURE_PATH = os.path.normpath(TEXTURE_PATH)
+TEXTURE_DIR = os.path.normpath(TEXTURE_DIR)
 
 # Chargement de l'image
-image = pygame.image.load(TEXTURE_PATH)
+# image = pygame.image.load(TEXTURE_DIR)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RIGHT_PANEL_COLOR = (50, 50, 50)  # Couleur de fond de la partie droite
