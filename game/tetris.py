@@ -103,7 +103,7 @@ class Tetris:
         self.fall_speed = 500  # Temps avant que la pièce tombe
         self.last_fall_time = pygame.time.get_ticks()
         self.last_move_time = pygame.time.get_ticks()  # Temps pour gérer la répétition des actions
-        self.repeat_rate = 50  # Temps avant qu'une action répétée soit exécutée
+        self.repeat_rate = 60  # Temps avant qu'une action répétée soit exécutée
         self.move_left_pressed = False
         self.move_right_pressed = False
         self.move_down_pressed = False
@@ -294,12 +294,18 @@ class Tetris:
 
     def reset(self):
         """Réinitialiser le jeu."""
-        self.board = [[None] * 10 for _ in range(20)]  # Corrected to 20 rows
+        self.board = [[None] * 10 for _ in range(20)]
         self.game_over = False
         self.score = 0
         self.create_piece()
         self.last_fall_time = pygame.time.get_ticks()
         self.last_move_time = pygame.time.get_ticks()
+
+        # Réinitialiser les inputs persistants
+        self.move_left_pressed = False
+        self.move_right_pressed = False
+        self.move_down_pressed = False
+
 
 
 # Fonction principale
