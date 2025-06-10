@@ -25,7 +25,15 @@ VERT = (50, 200, 50)
 ROUGE = (200, 50, 50)
 
 # Chargement des images de cartes
-chemin_cartes = os.path.join("game", "cards")
+def chemin_absolu_relatif(relatif):
+    if getattr(sys, 'frozen', False):
+        base_path = sys._MEIPASS  # dossier temporaire utilisé par PyInstaller
+    else:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relatif)
+
+chemin_cartes = chemin_absolu_relatif(os.path.join("game", "cards"))
+
 
 cartes_faces = [f for f in os.listdir(chemin_cartes) if f.endswith(".png") and f.upper() != "BACK.PNG"]
 cartes_faces = cartes_faces[:12]  # 12 paires
