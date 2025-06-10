@@ -1,41 +1,147 @@
 import pygame
 import sys
 import random
-from pygame.locals import *
-import subprocess
 import os
-# Initialiser pygame
+import time
+import subprocess
+from pygame.locals import *
+
 pygame.init()
 
-font_grande = pygame.font.Font(None, 36)  # Grande police
-font_petite = pygame.font.Font(None, 18)  # Petite police
+# Constantes
+LARGEUR_FENETRE = 800
+HAUTEUR_FENETRE = 800
+LIGNES = 4
+COLONNES = 6
+TAILLE_CARTE = (100, 140)
+MARGE = 20
+TEMPS_RETOUR = 0.5  # secondes
+DUREE_JEU = 180  # secondes
 
-couleur_texte_normal = (47, 6, 1)  # noir
-couleur_texte_survol = (34, 87, 122)  # bleu
+# Couleurs
+BLANC = (255, 255, 255)
+NOIR = (0, 0, 0)
+VERT = (50, 200, 50)
+ROUGE = (200, 50, 50)
 
-fenetre = pygame.display.set_mode((800, 600))
+# Chargement des images de cartes
+chemin_cartes = os.path.join("game", "cards")
 
-fenetre.fill((243, 232, 238))
-pygame.display.flip()
+cartes_faces = [f for f in os.listdir(chemin_cartes) if f.endswith(".png") and f.upper() != "BACK.PNG"]
+cartes_faces = cartes_faces[:12]  # 12 paires
+cartes_faces *= 2  # On double les cartes pour faire des paires
+random.shuffle(cartes_faces)
 
+cartes = []
+for i, nom in enumerate(cartes_faces):
+    image = pygame.image.load(os.path.join(chemin_cartes, nom))
+    image = pygame.transform.scale(image, TAILLE_CARTE)
+    cartes.append({
+        "nom": nom,
+        "image": image,
+        "rect": pygame.Rect(
+            MARGE + (TAILLE_CARTE[0] + MARGE) * (i % COLONNES),
+            MARGE + (TAILLE_CARTE[1] + MARGE) * (i // COLONNES),
+            *TAILLE_CARTE
+        ),
+        "visible": False,
+        "trouvee": False
+    })
 
-def main():
-    fenetre.blit(font_grande.render("Memeoir", True, couleur_texte_normal), (155, 10))
-    fenetre.blit(font_petite.render("Touche DELETE pour revenir au lobby", True, (245, 133, 73)), (155, 40))
-    
-        
+# Charger le dos de carte
+back_image = pygame.image.load(os.path.join(chemin_cartes, "BACK.png"))
+back_image = pygame.transform.scale(back_image, TAILLE_CARTE)
+
+# Fenêtre
+fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE))
+pygame.display.set_caption("Jeu de Memory")
+
+# Police
+police = pygame.font.SysFont(None, 36)
+
+def afficher_cartes():
+    for carte in cartes:
+        if carte["visible"] or carte["trouvee"]:
+            fenetre.blit(carte["image"], carte["rect"])
+        else:
+            fenetre.blit(back_image, carte["rect"])
+
+def afficher_infos(score, temps_restant):
+    texte_score = police.render(f"Score: {score}", True, NOIR)
+    texte_temps = police.render(f"Temps: {int(temps_restant)}s", True, NOIR)
+    fenetre.blit(texte_score, (10, HAUTEUR_FENETRE - 40))
+    fenetre.blit(texte_temps, (LARGEUR_FENETRE - 150, HAUTEUR_FENETRE - 40))
+
+def jeu_memory():
+    score = 0
+    premiere_carte = None
+    attente = False
+    temps_attente = 0
+    horloge = pygame.time.Clock()
+    debut = time.time()
     continuer = True
     while continuer:
+        
+
+
+        temps_restant = DUREE_JEU - (time.time() - debut)
+        if temps_restant <= 0:
+            return False
+
+        fenetre.fill(BLANC)
+        afficher_cartes()
+        afficher_infos(score, temps_restant)
+        pygame.display.flip()
+
+        if attente and time.time() >= temps_attente:
+            for carte in cartes:
+                if not carte["trouvee"]:
+                    carte["visible"] = False
+            attente = False
+            premiere_carte = None
+
         for event in pygame.event.get():
-            if event.type == KEYDOWN and event.key == K_DELETE:
+            if event.type == pygame.QUIT:
+                continuer = False
+                pygame.quit()
+                sys.exit()
+            elif event.type == KEYDOWN and event.key == K_DELETE:
                 continuer = False
                 pygame.quit()
                 relancer_main()
                 sys.exit()
-            elif event.type == pygame.QUIT:
-                pygame.quit()
+            elif event.type == pygame.MOUSEBUTTONDOWN and not attente:
+                pos = pygame.mouse.get_pos()
+                for carte in cartes:
+                    if carte["rect"].collidepoint(pos) and not carte["visible"] and not carte["trouvee"]:
+                        carte["visible"] = True
+                        if premiere_carte is None:
+                            premiere_carte = carte
+                        else:
+                            if carte["nom"] == premiere_carte["nom"]:
+                                carte["trouvee"] = True
+                                premiere_carte["trouvee"] = True
+                                score += 1
+                                premiere_carte = None
+                            else:
+                                attente = True
+                                temps_attente = time.time() + TEMPS_RETOUR
+                        break
 
-        pygame.display.update()  
+        if all(c["trouvee"] for c in cartes):
+            return True
+
+        horloge.tick(30)
+
+def afficher_fin(victoire):
+    texte = "Bravo, tu as gagné !" if victoire else "Temps écoulé..."
+    couleur = VERT if victoire else ROUGE
+    message = police.render(texte, True, couleur)
+    fenetre.fill(BLANC)
+    fenetre.blit(message, (LARGEUR_FENETRE // 2 - message.get_width() // 2, HAUTEUR_FENETRE // 2))
+    pygame.display.flip()
+    pygame.time.wait(3000)
+    relancer_main()
 
 
 def relancer_main():
@@ -51,5 +157,6 @@ def relancer_main():
     sys.exit()
 
 if __name__ == "__main__":
-    main()
-    pygame.quit()  
+    victoire = jeu_memory()
+    afficher_fin(victoire)
+    pygame.quit()

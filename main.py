@@ -7,6 +7,7 @@ from game import pendu
 from game import blackjack
 from game import tetris
 from game import pong2
+from game import memoir
 
 import random
 
@@ -146,10 +147,10 @@ def main():
 
                     if texte == "Memoir" or select == 8:
                         
-                        pygame.display.set_mode((800, 600))
-                        # pongbot.main()  
-                        print("Memoir")
-                        continuer = True
+                        pygame.display.set_mode((800, 800))
+                        memoir.jeu_memory()  
+                        
+                        continuer = False
 
                     if texte == "Pong 1V1" or select == 9:
                         
