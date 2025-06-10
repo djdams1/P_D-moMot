@@ -4,6 +4,7 @@ import random
 import os
 import time
 import subprocess
+import math
 from pygame.locals import *
 
 pygame.init()
@@ -17,6 +18,7 @@ TAILLE_CARTE = (100, 140)
 MARGE = 20
 TEMPS_RETOUR = 0.5  # secondes
 DUREE_JEU = 180  # secondes
+DUREE_ANIMATION = 0.2  # secondes pour l'animation de retournement
 
 # Couleurs
 BLANC = (255, 255, 255)
@@ -26,11 +28,10 @@ ROUGE = (200, 50, 50)
 
 # Chargement des images de cartes
 def chemin_absolu_relatif(relatif):
-    if getattr(sys, 'frozen', False):  # Si exécuté en .exe
+    if getattr(sys, 'frozen', False):
         base_path = sys._MEIPASS
-    else:  # Sinon, chemin normal
+    else:
         base_path = os.path.abspath(".")
-
     return os.path.join(base_path, relatif)
 
 chemin_cartes = chemin_absolu_relatif("game/cards")
@@ -44,6 +45,7 @@ cartes_faces = [f for f in os.listdir(chemin_cartes) if f.endswith(".png") and f
 cartes_faces = random.sample(cartes_faces, 12)
 cartes_faces *= 2
 random.shuffle(cartes_faces)
+
 cartes = []
 for i, nom in enumerate(cartes_faces):
     image = pygame.image.load(os.path.join(chemin_cartes, nom))
@@ -57,7 +59,9 @@ for i, nom in enumerate(cartes_faces):
             *TAILLE_CARTE
         ),
         "visible": False,
-        "trouvee": False
+        "trouvee": False,
+        "animation_debut": 0,
+        "animation_type": None  # "retourner" ou "cacher"
     })
 
 # Dos de carte
@@ -71,12 +75,70 @@ pygame.display.set_caption("Jeu de Memory")
 # Police
 police = pygame.font.SysFont(None, 36)
 
-def afficher_cartes():
-    for carte in cartes:
+def dessiner_carte_animee(carte, temps_actuel):
+    """Dessine une carte avec animation de retournement"""
+    if carte["animation_type"] is None:
+        # Pas d'animation, affichage normal
         if carte["visible"] or carte["trouvee"]:
             fenetre.blit(carte["image"], carte["rect"])
         else:
             fenetre.blit(back_image, carte["rect"])
+        return
+    
+    # Calcul du pourcentage d'animation (0 à 1)
+    temps_ecoule = temps_actuel - carte["animation_debut"]
+    progression = min(temps_ecoule / DUREE_ANIMATION, 1.0)
+    
+    # Animation terminée ?
+    if progression >= 1.0:
+        carte["animation_type"] = None
+        if carte["visible"] or carte["trouvee"]:
+            fenetre.blit(carte["image"], carte["rect"])
+        else:
+            fenetre.blit(back_image, carte["rect"])
+        return
+    
+    # Calcul de l'effet de rotation (effet de retournement)
+    # On fait une rotation de 0° à 180° puis de 180° à 360°
+    angle = progression * math.pi  # 0 à π radians
+    
+    # Largeur de la carte selon l'angle (effet 3D)
+    largeur_originale = TAILLE_CARTE[0]
+    largeur_actuelle = int(abs(math.cos(angle)) * largeur_originale)
+    
+    # Éviter une largeur de 0
+    if largeur_actuelle < 1:
+        largeur_actuelle = 1
+    
+    # Déterminer quelle image afficher
+    if angle < math.pi / 2:  # Première moitié : on voit encore l'image actuelle
+        if carte["animation_type"] == "retourner":
+            # On retourne vers la face
+            image_a_afficher = back_image if not carte["visible"] else carte["image"]
+        else:  # "cacher"
+            # On retourne vers le dos
+            image_a_afficher = carte["image"] if carte["visible"] else back_image
+    else:  # Deuxième moitié : on voit la nouvelle image
+        if carte["animation_type"] == "retourner":
+            # On retourne vers la face
+            image_a_afficher = carte["image"] if carte["visible"] else back_image
+        else:  # "cacher"
+            # On retourne vers le dos
+            image_a_afficher = back_image if not carte["visible"] else carte["image"]
+    
+    # Redimensionner l'image selon la largeur calculée
+    image_redimensionnee = pygame.transform.scale(image_a_afficher, (largeur_actuelle, TAILLE_CARTE[1]))
+    
+    # Position centrée
+    x_centre = carte["rect"].centerx - largeur_actuelle // 2
+    y_centre = carte["rect"].centery - TAILLE_CARTE[1] // 2
+    
+    # Afficher l'image animée
+    fenetre.blit(image_redimensionnee, (x_centre, y_centre))
+
+def afficher_cartes(temps_actuel):
+    for carte in cartes:
+        dessiner_carte_animee(carte, temps_actuel)
 
 def afficher_infos(score, temps_restant):
     texte_score = police.render(f"Score: {score}", True, NOIR)
@@ -103,7 +165,6 @@ def afficher_fin(victoire, temps_restant):
     relancer_main()
 
 def relancer_main():
-    # Relance le programme principal (main.py ou main.exe)
     if getattr(sys, 'frozen', False):
         base_path = os.path.dirname(sys.executable)
         main_path = os.path.join(base_path, "main.exe")
@@ -113,6 +174,20 @@ def relancer_main():
     
     subprocess.run([sys.executable, main_path])
     sys.exit()
+
+def demarrer_animation_retourner(carte, temps_actuel):
+    """Démarre l'animation de retournement d'une carte"""
+    carte["animation_debut"] = temps_actuel
+    carte["animation_type"] = "retourner"
+
+def demarrer_animation_cacher(carte, temps_actuel):
+    """Démarre l'animation pour cacher une carte"""
+    carte["animation_debut"] = temps_actuel
+    carte["animation_type"] = "cacher"
+
+def animation_en_cours():
+    """Vérifie si une animation est en cours"""
+    return any(carte["animation_type"] is not None for carte in cartes)
 
 def jeu_memory():
     score = 0
@@ -124,19 +199,23 @@ def jeu_memory():
     continuer = True
 
     while continuer:
-        temps_restant = DUREE_JEU - (time.time() - debut)
+        temps_actuel = time.time()
+        temps_restant = DUREE_JEU - (temps_actuel - debut)
+        
         if temps_restant <= 0:
             afficher_fin(False, 0)
             return
 
         fenetre.fill(BLANC)
-        afficher_cartes()
+        afficher_cartes(temps_actuel)
         afficher_infos(score, temps_restant)
         pygame.display.flip()
 
-        if attente and time.time() >= temps_attente:
+        # Gestion de l'attente après deux cartes non-matching
+        if attente and temps_actuel >= temps_attente and not animation_en_cours():
             for carte in cartes:
-                if not carte["trouvee"]:
+                if not carte["trouvee"] and carte["visible"]:
+                    demarrer_animation_cacher(carte, temps_actuel)
                     carte["visible"] = False
             attente = False
             premiere_carte = None
@@ -151,11 +230,13 @@ def jeu_memory():
                 pygame.quit()
                 relancer_main()
                 sys.exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN and not attente:
+            elif event.type == pygame.MOUSEBUTTONDOWN and not attente and not animation_en_cours():
                 pos = pygame.mouse.get_pos()
                 for carte in cartes:
                     if carte["rect"].collidepoint(pos) and not carte["visible"] and not carte["trouvee"]:
                         carte["visible"] = True
+                        demarrer_animation_retourner(carte, temps_actuel)
+                        
                         if premiere_carte is None:
                             premiere_carte = carte
                         else:
@@ -166,14 +247,14 @@ def jeu_memory():
                                 premiere_carte = None
                             else:
                                 attente = True
-                                temps_attente = time.time() + TEMPS_RETOUR
+                                temps_attente = temps_actuel + TEMPS_RETOUR + DUREE_ANIMATION
                         break
 
         if all(c["trouvee"] for c in cartes):
             afficher_fin(True, temps_restant)
             return
 
-        horloge.tick(30)
+        horloge.tick(60)  # Augmenté à 60 FPS pour des animations plus fluides
 
 if __name__ == "__main__":
     jeu_memory()
