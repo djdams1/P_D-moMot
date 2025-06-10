@@ -51,17 +51,17 @@ CHOIX = [
 
 # Position de chaque texte
 positions = [
-    (155, 10),
-    (155, 100),
-    (155, 130),
-    (155, 160),
-    (155, 190),
-    (155, 220),
-    (155, 250),
-    (155, 280),
-    (155, 310),
-    (155, 340),
-    (155, 450)
+    (120, 10),
+    (120, 100),
+    (120, 130),
+    (120, 160),
+    (120, 190),
+    (120, 220),
+    (120, 250),
+    (120, 280),
+    (120, 310),
+    (120, 340),
+    (120, 450)
 ]
 
 continuer = True
@@ -71,6 +71,9 @@ pygame.display.flip()
 
 
 def main():
+    logo = pygame.image.load("textures/logo.png")  # Assurez-vous que le fichier existe
+    pygame.display.set_icon(logo)
+
     global fenetre  # Assurer l'utilisation de la variable globale fenetre
     global continuer
     select = 0
