@@ -68,11 +68,24 @@ continuer = True
 
 fenetre.fill((243, 232, 238))
 pygame.display.flip()
+def resource_path(relative_path):
+    """Obtenir le chemin absolu, compatible avec PyInstaller."""
+    try:
+        # PyInstaller crée un dossier temporaire _MEIPASS
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 
 def main():
-    logo = pygame.image.load("textures/logo.png")  # Assurez-vous que le fichier existe
-    pygame.display.set_icon(logo)
+    try:
+        logo_path = resource_path("textures/logo.png")
+        logo = pygame.image.load(logo_path)
+        pygame.display.set_icon(logo)
+    except Exception as e:
+        print(f"Logo non trouvé ou erreur de chargement : {e}")
 
     global fenetre  # Assurer l'utilisation de la variable globale fenetre
     global continuer

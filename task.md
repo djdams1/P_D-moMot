@@ -16,4 +16,5 @@ tetris :
     patch les glitches entre pièce ✅
  
 commande pour faire un exe
-python -m PyInstaller --noconfirm --windowed --onefile --name "LobbyGame" --icon "D:\P_Dmot\textures\logo.ico" --distpath "D:\DemoMot\P_D-moMot-main\build" --add-data "game;game" --add-data "game/cards;game/cards" --add-data "textures;textures" main.py
+python -m PyInstaller --noconfirm --windowed --onefile --name "LobbyGame" --icon "D:\DemoMot\P_D-moMot-main\textures\logo.ico" --distpath "D:\DemoMot\P_D-moMot-main\build" --add-data "game;game" --add-data "game/cards;game/cards" --add-data "textures;textures" main.py
+ 
