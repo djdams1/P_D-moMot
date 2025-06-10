@@ -141,20 +141,21 @@ def afficher_fin(victoire):
     fenetre.blit(message, (LARGEUR_FENETRE // 2 - message.get_width() // 2, HAUTEUR_FENETRE // 2))
     pygame.display.flip()
     pygame.time.wait(3000)
+
+    pygame.quit()
     relancer_main()
 
 
 def relancer_main():
-    # Détecte si on est dans un .exe (PyInstaller)
     if getattr(sys, 'frozen', False):
         base_path = os.path.dirname(sys.executable)
-        main_path = os.path.join(base_path, "main.exe")  # si compilé
+        main_path = os.path.join(base_path, "main.exe")
     else:
         base_path = os.path.dirname(os.path.abspath(__file__))
-        main_path = os.path.abspath(os.path.join(base_path, "..", "main.py"))  # si .py
+        main_path = os.path.abspath(os.path.join(base_path, "..", "main.py"))
     
-    subprocess.run([sys.executable, main_path])
-    sys.exit()
+    subprocess.Popen([sys.executable, main_path])  # Ne bloque pas l'exécution
+    return  # <-- pas de sys.exit() ici
 
 if __name__ == "__main__":
     victoire = jeu_memory()
