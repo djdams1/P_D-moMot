@@ -29,7 +29,7 @@ chemin_cartes = os.path.join("game", "cards")
 
 cartes_faces = [f for f in os.listdir(chemin_cartes) if f.endswith(".png") and f.upper() != "BACK.PNG"]
 cartes_faces = cartes_faces[:12]  # 12 paires
-cartes_faces *= 2  # On double les cartes pour faire des paires
+cartes_faces *= 2
 random.shuffle(cartes_faces)
 
 cartes = []
@@ -72,6 +72,27 @@ def afficher_infos(score, temps_restant):
     fenetre.blit(texte_score, (10, HAUTEUR_FENETRE - 40))
     fenetre.blit(texte_temps, (LARGEUR_FENETRE - 150, HAUTEUR_FENETRE - 40))
 
+def afficher_fin(victoire):
+    texte = "Bravo, tu as gagné !" if victoire else "Temps écoulé..."
+    couleur = VERT if victoire else ROUGE
+    message = police.render(texte, True, couleur)
+    fenetre.fill(BLANC)
+    fenetre.blit(message, (LARGEUR_FENETRE // 2 - message.get_width() // 2, HAUTEUR_FENETRE // 2))
+    pygame.display.flip()
+    pygame.time.wait(3000)
+    pygame.quit()
+    relancer_main()
+
+def relancer_main():
+    if getattr(sys, 'frozen', False):
+        base_path = os.path.dirname(sys.executable)
+        main_path = os.path.join(base_path, "main.exe")
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        main_path = os.path.abspath(os.path.join(base_path, "..", "main.py"))
+    
+    subprocess.Popen([sys.executable, main_path])
+
 def jeu_memory():
     score = 0
     premiere_carte = None
@@ -80,13 +101,12 @@ def jeu_memory():
     horloge = pygame.time.Clock()
     debut = time.time()
     continuer = True
+
     while continuer:
-        
-
-
         temps_restant = DUREE_JEU - (time.time() - debut)
         if temps_restant <= 0:
-            return False
+            afficher_fin(False)
+            return
 
         fenetre.fill(BLANC)
         afficher_cartes()
@@ -129,35 +149,11 @@ def jeu_memory():
                         break
 
         if all(c["trouvee"] for c in cartes):
-            return True
+            afficher_fin(True)
+            return
 
         horloge.tick(30)
 
-def afficher_fin(victoire):
-    texte = "Bravo, tu as gagné !" if victoire else "Temps écoulé..."
-    couleur = VERT if victoire else ROUGE
-    message = police.render(texte, True, couleur)
-    fenetre.fill(BLANC)
-    fenetre.blit(message, (LARGEUR_FENETRE // 2 - message.get_width() // 2, HAUTEUR_FENETRE // 2))
-    pygame.display.flip()
-    pygame.time.wait(3000)
-
-    pygame.quit()
-    relancer_main()
-
-
-def relancer_main():
-    if getattr(sys, 'frozen', False):
-        base_path = os.path.dirname(sys.executable)
-        main_path = os.path.join(base_path, "main.exe")
-    else:
-        base_path = os.path.dirname(os.path.abspath(__file__))
-        main_path = os.path.abspath(os.path.join(base_path, "..", "main.py"))
-    
-    subprocess.Popen([sys.executable, main_path])  # Ne bloque pas l'exécution
-    return  # <-- pas de sys.exit() ici
-
+# Si jamais tu veux tester en solo
 if __name__ == "__main__":
-    victoire = jeu_memory()
-    afficher_fin(victoire)
-    pygame.quit()
+    jeu_memory()
