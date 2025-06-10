@@ -40,11 +40,10 @@ if not os.path.exists(chemin_cartes):
 
 cartes_faces = [f for f in os.listdir(chemin_cartes) if f.endswith(".png") and f.upper() != "BACK.PNG"]
 
-# On prend 12 paires, dupliquées puis mélangées
-cartes_faces = cartes_faces[:12]
+# Sélection aléatoire de 12 cartes, puis duplication pour faire les paires
+cartes_faces = random.sample(cartes_faces, 12)
 cartes_faces *= 2
 random.shuffle(cartes_faces)
-
 cartes = []
 for i, nom in enumerate(cartes_faces):
     image = pygame.image.load(os.path.join(chemin_cartes, nom))
