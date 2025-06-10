@@ -16,8 +16,8 @@ pygame.init()
 fenetre = pygame.display.set_mode((640, 500))
 pygame.display.set_caption("Lobby Game")
 
-font_grande = pygame.font.Font(None, 36)  # Grande police
-font_petite = pygame.font.Font(None, 18)  # Petite police
+font_grande = pygame.font.SysFont('Century Gothic', 33)
+font_petite = pygame.font.SysFont('Century Gothic', 18)  # Petite police
 
 couleur_texte_normal = (47, 6, 1)  # noir
 couleur_texte_survol = (34, 87, 122)  # bleu
@@ -61,7 +61,7 @@ positions = [
     (155, 280),
     (155, 310),
     (155, 340),
-    (155, 470)
+    (155, 450)
 ]
 
 continuer = True

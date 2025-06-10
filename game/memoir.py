@@ -26,17 +26,22 @@ ROUGE = (200, 50, 50)
 
 # Chargement des images de cartes
 def chemin_absolu_relatif(relatif):
-    if getattr(sys, 'frozen', False):
-        base_path = sys._MEIPASS  # dossier temporaire utilisé par PyInstaller
-    else:
+    if getattr(sys, 'frozen', False):  # Si exécuté en .exe
+        base_path = sys._MEIPASS
+    else:  # Sinon, chemin normal
         base_path = os.path.abspath(".")
+
     return os.path.join(base_path, relatif)
 
-chemin_cartes = chemin_absolu_relatif(os.path.join("game", "cards"))
+chemin_cartes = chemin_absolu_relatif("game/cards")
 
+if not os.path.exists(chemin_cartes):
+    raise FileNotFoundError(f"Le dossier des cartes n'existe pas : {chemin_cartes}")
 
 cartes_faces = [f for f in os.listdir(chemin_cartes) if f.endswith(".png") and f.upper() != "BACK.PNG"]
-cartes_faces = cartes_faces[:12]  # 12 paires
+
+# On prend 12 paires, dupliquées puis mélangées
+cartes_faces = cartes_faces[:12]
 cartes_faces *= 2
 random.shuffle(cartes_faces)
 
@@ -56,7 +61,7 @@ for i, nom in enumerate(cartes_faces):
         "trouvee": False
     })
 
-# Charger le dos de carte
+# Dos de carte
 back_image = pygame.image.load(os.path.join(chemin_cartes, "BACK.png"))
 back_image = pygame.transform.scale(back_image, TAILLE_CARTE)
 
@@ -80,8 +85,15 @@ def afficher_infos(score, temps_restant):
     fenetre.blit(texte_score, (10, HAUTEUR_FENETRE - 40))
     fenetre.blit(texte_temps, (LARGEUR_FENETRE - 150, HAUTEUR_FENETRE - 40))
 
-def afficher_fin(victoire):
-    texte = "Bravo, tu as gagné !" if victoire else "Temps écoulé..."
+def afficher_fin(victoire, temps_restant):
+    if victoire:
+        temps_utilise = DUREE_JEU - int(temps_restant)
+        minutes = temps_utilise // 60
+        secondes = temps_utilise % 60
+        texte = f"Bravo, tu as gagné ! Tu as pris {minutes:02d}:{secondes:02d}"
+    else:
+        texte = "Temps écoulé..."
+
     couleur = VERT if victoire else ROUGE
     message = police.render(texte, True, couleur)
     fenetre.fill(BLANC)
@@ -92,6 +104,7 @@ def afficher_fin(victoire):
     relancer_main()
 
 def relancer_main():
+    # Relance le programme principal (main.py ou main.exe)
     if getattr(sys, 'frozen', False):
         base_path = os.path.dirname(sys.executable)
         main_path = os.path.join(base_path, "main.exe")
@@ -99,7 +112,8 @@ def relancer_main():
         base_path = os.path.dirname(os.path.abspath(__file__))
         main_path = os.path.abspath(os.path.join(base_path, "..", "main.py"))
     
-    subprocess.Popen([sys.executable, main_path])
+    subprocess.run([sys.executable, main_path])
+    sys.exit()
 
 def jeu_memory():
     score = 0
@@ -113,7 +127,7 @@ def jeu_memory():
     while continuer:
         temps_restant = DUREE_JEU - (time.time() - debut)
         if temps_restant <= 0:
-            afficher_fin(False)
+            afficher_fin(False, 0)
             return
 
         fenetre.fill(BLANC)
@@ -157,11 +171,10 @@ def jeu_memory():
                         break
 
         if all(c["trouvee"] for c in cartes):
-            afficher_fin(True)
+            afficher_fin(True, temps_restant)
             return
 
         horloge.tick(30)
 
-# Si jamais tu veux tester en solo
 if __name__ == "__main__":
     jeu_memory()
