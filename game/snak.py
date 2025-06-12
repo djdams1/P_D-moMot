@@ -87,7 +87,7 @@ def main():
             pygame.draw.rect(fenetre, (255, 0, 0), (pomme[0]*TILE_SIZE, pomme[1]*TILE_SIZE, TILE_SIZE, TILE_SIZE))
         # snake
         for segment in snake:
-            pygame.draw.rect(fenetre, (0, 255, 0), (segment[0]*TILE_SIZE, segment[1]*TILE_SIZE, TILE_SIZE, TILE_SIZE))
+            pygame.draw.rect(fenetre, (109,118,91) , (segment[0]*TILE_SIZE, segment[1]*TILE_SIZE, TILE_SIZE, TILE_SIZE))
 
         pygame.display.update()
         clock.tick(10)
