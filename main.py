@@ -1,4 +1,6 @@
 import pygame
+import os
+import sys
 from pygame.locals import *
 from game import pongbot
 from game import fpc
@@ -8,6 +10,7 @@ from game import blackjack
 from game import tetris
 from game import pong2
 from game import memoir
+from game import snak
 
 import random
 
@@ -127,9 +130,8 @@ def main():
                     if texte == "Snake" or select == 2:
                         
                         pygame.display.set_mode((800, 600))
-                        # pongbot.main()  
-                        print("Snake")
-                        continuer = True
+                        snak.main()  
+                        continuer = False
 
                     if texte == "Pong" or select == 3:
                         
@@ -183,7 +185,7 @@ def main():
                         continuer = True
 
 
-        fenetre.blit(font_petite.render("Touche DELETE pour quitter", True, (245, 133, 73)), (155, 40))
+        fenetre.blit(font_petite.render("Touche DELETE pour quitter", True, (245, 133, 73)), (120, 40))
 
         pygame.display.update()
 
