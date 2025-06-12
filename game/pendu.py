@@ -110,7 +110,7 @@ def afficher_mot_cache(mot, lettres_trouvees):
     return affichage.strip()
 
 def stopgame(message_fin):
-    fenetre.blit(font_grande.render(message_fin, True, (200, 0, 0)), (50, 300))
+    fenetre.blit(font_moyenne.render(message_fin, True, (200, 0, 0)), (50, 300))
     pygame.display.update()
     pygame.time.wait(3000)  # pause 3 secondes
     pygame.quit()
@@ -196,7 +196,7 @@ def main():
                                 lettres_trouvees.update(set(mot))  # Pour afficher le mot entier
                                 message_fin = f"Perdu ! Le mot était : {mot}"
                                 fenetre.fill(couleur_fond)
-                                fenetre.blit(font_grande.render("Pendu", True, couleur_texte_normal), (155, 10))
+                                fenetre.blit(font_moyenne.render("Pendu", True, couleur_texte_normal), (155, 10))
                                 mot_cache = afficher_mot_cache(mot, lettres_trouvees)
                                 texte_mot = font_moyenne.render(mot_cache, True, couleur_texte_normal)
                                 fenetre.blit(texte_mot, (155, 150))
