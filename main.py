@@ -74,23 +74,13 @@ positions = [
     (120, 450)
 ]
 
-# varibale de loup
+# varibale de loop
 continuer = True
 
 # mette le couleur de fond puis refreche
 fenetre.fill((243, 232, 238))
 pygame.display.flip()
 
-"""Fonction pour trouver le 'favicon' dans l'exe ou pas"""
-def resource_path(relative_path):
-    # essaye de créé un dossier temporaire
-    try:
-        # PyInstaller crée un dossier temporaire _MEIPASS
-        base_path = sys._MEIPASS
-    except AttributeError:
-        base_path = os.path.abspath(".")
-
-    return os.path.join(base_path, relative_path)
 
 """Boucle principale"""
 def main():
@@ -209,6 +199,18 @@ def main():
             if event.type == KEYDOWN and event.key == K_DELETE or event.type == pygame.QUIT:
                 continuer = False
                 pygame.quit()
+
+
+"""Fonction pour trouver le 'favicon' dans l'exe ou pas"""
+def resource_path(relative_path):
+    # essaye de créé un dossier temporaire
+    try:
+        # PyInstaller crée un dossier temporaire _MEIPASS
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 
 if __name__ == "__main__":
