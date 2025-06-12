@@ -1,3 +1,8 @@
+# ETML
+# Author : Damien Rochat
+# Date : 02/06/2025
+# Description : Jeu du pong à 2 joueurs
+
 import pygame
 import sys
 import random

@@ -1,3 +1,9 @@
+# ETML
+# Author : Damien Rochat
+# Date : 05/06/2025
+# Description : Jeux de tetris avec texture
+
+
 import pygame
 import sys
 import random

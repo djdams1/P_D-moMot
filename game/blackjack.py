@@ -1,3 +1,7 @@
+# ETML
+# Author : Damien Rochat
+# Date : 02/06/2025
+# Description : BlackJack avec le casino qui ne gagne pas tous le temps
 import pygame
 import sys
 import random

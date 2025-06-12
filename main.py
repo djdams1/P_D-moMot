@@ -1,3 +1,8 @@
+# ETML
+# Author : Damien Rochat
+# Date : 02/06/2025
+# Description : Système de lancement des jeux par interface graphique
+
 import pygame
 import os
 import sys

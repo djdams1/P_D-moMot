@@ -1,3 +1,8 @@
+# ETML
+# Author : Damien Rochat
+# Date : 02/06/2025
+# Description : jeu du Shi-Fu-Mi contre l'ordinateur
+
 import pygame
 import sys
 import random
@@ -43,7 +48,6 @@ def main():
     font_petite = pygame.font.Font(None, 18)  # Petite police
 
     couleur_texte_normal = (47, 6, 1)  # noir
-    couleur_texte_survol = (34, 87, 122)  # bleu
     couleur_fond = (243, 232, 238)
 
     fenetre = pygame.display.set_mode((800, 600))

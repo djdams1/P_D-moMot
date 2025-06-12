@@ -1,3 +1,7 @@
+# ETML
+# Author : Damien Rochat
+# Date : 02/06/2025
+# Description : Jeu du memory avec carte aléatoire
 import pygame
 import sys
 import random
