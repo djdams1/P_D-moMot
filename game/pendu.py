@@ -48,7 +48,7 @@ def get_random_french_word_local():
     mots = []
     for ligne in lignes:
         mot = nettoyer_mot(ligne)
-        if mot and 5 <= len(mot) <= 10:
+        if mot and 3 <= len(mot) <= 50:
             mots.append(mot)
     if not mots:
         print("Liste vide après filtrage.")
