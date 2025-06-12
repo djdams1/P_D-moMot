@@ -17,11 +17,11 @@ WIDTH, HEIGHT = 800, 600
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Pong - 1 Joueur contre l'ordinateur")
 
-font_grande = pygame.font.Font(None, 36)  # Grande police
-font_petite = pygame.font.Font(None, 18)  # Petite police
-
-couleur_texte_normal = (47, 6, 1)  # noir
-couleur_texte_survol = (34, 87, 122)  # bleu
+# Polices et couleurs
+font_grande = pygame.font.SysFont('Century Gothic', 33)
+font_petite = pygame.font.SysFont('Century Gothic', 18)
+couleur_texte_normal = (47, 6, 1)
+couleur_texte_survol = (34, 87, 122)
 
 # Couleurs
 WHITE = (47, 6, 1)

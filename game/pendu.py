@@ -15,9 +15,9 @@ import time
 pygame.init()
 
 # Polices et couleurs
-font_grande = pygame.font.Font(None, 48)
-font_moyenne = pygame.font.Font(None, 36)
-font_petite = pygame.font.Font(None, 18)
+font_grande = pygame.font.SysFont('Century Gothic', 48)
+font_moyenne = pygame.font.SysFont('Century Gothic', 36)
+font_petite = pygame.font.SysFont('Century Gothic', 18)
 couleur_texte_normal = (47, 6, 1)
 couleur_texte_survol = (34, 87, 122)
 couleur_fond = (243, 232, 238)

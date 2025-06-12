@@ -17,8 +17,11 @@ WIDTH, HEIGHT = 800, 600
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Pong à 2 joueurs")
 
-font_grande = pygame.font.Font(None, 36)  # Grande police
-font_petite = pygame.font.Font(None, 18)  # Petite police
+# Polices et couleurs
+font_grande = pygame.font.SysFont('Century Gothic', 33)
+font_petite = pygame.font.SysFont('Century Gothic', 18)
+WHITE = (47, 6, 1)
+BLACK = (34, 87, 122)
 
 
 # Couleurs

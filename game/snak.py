@@ -30,7 +30,7 @@ NB_TILES_Y = 600 // TILE_SIZE
 def main():
     snake = [(5, 5)]
     direction = (1, 0)
-    pommes = [(random.randint(0, NB_TILES_X - 1), random.randint(0, NB_TILES_Y - 1)) for _ in range(4)]
+    pommes = [(random.randint(0, NB_TILES_X - 1), random.randint(0, NB_TILES_Y - 1)) for _ in range(800)]
     score = 0
     continuer = True
 

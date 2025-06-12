@@ -17,9 +17,9 @@ WIDTH, HEIGHT = 800, 600
 fenetre = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Morpion")
 
-# Polices
-font_grande = pygame.font.Font(None, 36)
-font_petite = pygame.font.Font(None, 18)
+# Polices et couleurs
+font_grande = pygame.font.SysFont('Century Gothic', 33)
+font_petite = pygame.font.SysFont('Century Gothic', 18)
 
 # Couleurs
 COULEUR_TEXTE = (47, 6, 1)       # Couleur texte et symboles
