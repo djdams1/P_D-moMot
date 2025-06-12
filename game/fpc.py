@@ -1,6 +1,6 @@
 # ETML
 # Author : Damien Rochat
-# Date : 02/06/2025
+# Date : 03/06/2025
 # Description : jeu du Shi-Fu-Mi contre l'ordinateur
 
 import pygame

@@ -1,6 +1,6 @@
 # ETML
 # Author : Damien Rochat
-# Date : 02/06/2025
+# Date : 03/06/2025
 # Description : Jeu du pendu avec dictionaire de 50000 mots
 import pygame
 import sys

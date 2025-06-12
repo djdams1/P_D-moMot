@@ -1,6 +1,6 @@
 # ETML
 # Author : Damien Rochat
-# Date : 02/06/2025
+# Date : 10/06/2025
 # Description : Jeux de Snake sur toute la fenêtre
 
 import pygame

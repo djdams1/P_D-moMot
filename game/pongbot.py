@@ -1,6 +1,6 @@
 # ETML
 # Author : Damien Rochat
-# Date : 02/06/2025
+# Date : 03/06/2025
 # Description : Jeu du pong comptre l'ordinateur
 
 import pygame
