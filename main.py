@@ -3,9 +3,11 @@
 # Date : 02/06/2025
 # Description : Système de lancement des jeux par interface graphique
 
+# liste d'import
 import pygame
 import os
 import sys
+import random
 from pygame.locals import *
 from game import pongbot
 from game import fpc
@@ -17,16 +19,16 @@ from game import pong2
 from game import memoir
 from game import snak
 
-import random
-
-
+# init la fenetre
 pygame.init()
 fenetre = pygame.display.set_mode((640, 500))
 pygame.display.set_caption("Lobby Game")
 
+# deffinit les fonts
 font_grande = pygame.font.SysFont('Century Gothic', 33)
 font_petite = pygame.font.SysFont('Century Gothic', 18)  # Petite police
 
+# deffinit les couleures 
 couleur_texte_normal = (47, 6, 1)  # noir
 couleur_texte_survol = (34, 87, 122)  # bleu
 
@@ -72,12 +74,16 @@ positions = [
     (120, 450)
 ]
 
+# varibale de loup
 continuer = True
 
+# mette le couleur de fond puis refreche
 fenetre.fill((243, 232, 238))
 pygame.display.flip()
+
+"""Fonction pour trouver le 'favicon' dans l'exe ou pas"""
 def resource_path(relative_path):
-    """Obtenir le chemin absolu, compatible avec PyInstaller."""
+    # essaye de créé un dossier temporaire
     try:
         # PyInstaller crée un dossier temporaire _MEIPASS
         base_path = sys._MEIPASS
@@ -86,8 +92,9 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
-
+"""Boucle principale"""
 def main():
+    # essaye de load la favicon
     try:
         logo_path = resource_path("textures/logo.png")
         logo = pygame.image.load(logo_path)
@@ -95,10 +102,13 @@ def main():
     except Exception as e:
         print(f"Logo non trouvé ou erreur de chargement : {e}")
 
-    global fenetre  # Assurer l'utilisation de la variable globale fenetre
+    # mets fenetre et continier en global pour etre utiliser dans toutes les methode
+    global fenetre  
     global continuer
-    select = 0
-    # Boucle infinie du lobby
+
+    select = 0 # varibale de choix aléatoire
+    
+    # boucle du lobby
     while continuer:
         fenetre.fill((243, 232, 238))
 
@@ -125,7 +135,7 @@ def main():
             if position[1] <= pos_souris[1] <= position[1] + 20 and couleur_texte == couleur_texte_survol:
                 if pygame.mouse.get_pressed()[0] or select != 0:
                     
-
+                    # scondition pour ouvrire chaque jeux
                     if texte == "Shi-Fu-Mi" or select == 1:
                         
                         pygame.display.set_mode((800, 600))
@@ -194,7 +204,7 @@ def main():
 
         pygame.display.update()
 
-        # Événements
+        # Événements pour quitté
         for event in pygame.event.get():
             if event.type == KEYDOWN and event.key == K_DELETE or event.type == pygame.QUIT:
                 continuer = False
