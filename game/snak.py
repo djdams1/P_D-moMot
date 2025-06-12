@@ -1,7 +1,7 @@
 # ETML
 # Author : Damien Rochat
-# Date : 10/06/2025
-# Description : Jeux de Snake sur toute la fenêtre
+# Date : 02/06/2025
+# Description : Système de lancement des jeux par interface graphique
 
 import pygame
 import sys
@@ -10,18 +10,19 @@ from pygame.locals import *
 import subprocess
 import os
 
+# Init Pygame
 pygame.init()
-
-font_grande = pygame.font.Font(None, 36)
-font_petite = pygame.font.Font(None, 18)
-
-couleur_texte_normal = (47, 6, 1)
-couleur_texte_survol = (34, 87, 122)
-
 fenetre = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Snake Game")
 clock = pygame.time.Clock()
 
+# Polices et couleurs
+font_grande = pygame.font.SysFont('Century Gothic', 33)
+font_petite = pygame.font.SysFont('Century Gothic', 18)
+couleur_texte_normal = (47, 6, 1)
+couleur_texte_survol = (34, 87, 122)
+
+# Taille des cases (grille)
 TILE_SIZE = 20
 NB_TILES_X = 800 // TILE_SIZE
 NB_TILES_Y = 600 // TILE_SIZE
@@ -29,11 +30,12 @@ NB_TILES_Y = 600 // TILE_SIZE
 def main():
     snake = [(5, 5)]
     direction = (1, 0)
-    apple = (random.randint(0, NB_TILES_X - 1), random.randint(0, NB_TILES_Y - 1))
+    pommes = [(random.randint(0, NB_TILES_X - 1), random.randint(0, NB_TILES_Y - 1)) for _ in range(4)]
     score = 0
     continuer = True
 
     while continuer:
+        # Gestion des événements (clavier & fermeture)
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -53,48 +55,51 @@ def main():
                 elif event.key == K_RIGHT and direction != (-1, 0):
                     direction = (1, 0)
 
-        # Move snake
+        # Déplacement du snake
         head = (snake[0][0] + direction[0], snake[0][1] + direction[1])
-        if (
-            head in snake
-            or head[0] < 0
-            or head[1] < 0
-            or head[0] >= NB_TILES_X
-            or head[1] >= NB_TILES_Y
-        ):
-            continuer = False  # Game Over
+
+        # Collision : mur ou soi-même = Game Over
+        if head in snake or head[0] < 0 or head[1] < 0 or head[0] >= NB_TILES_X or head[1] >= NB_TILES_Y:
+            continuer = False
 
         snake.insert(0, head)
 
-        if head == apple:
+        # Si pomme mangée
+        if head in pommes:
             score += 1
-            apple = (random.randint(0, NB_TILES_X - 1), random.randint(0, NB_TILES_Y - 1))
+            index = pommes.index(head)
+            # Générer nouvelle pomme
+            while True:
+                nouvelle_pomme = (random.randint(0, NB_TILES_X - 1), random.randint(0, NB_TILES_Y - 1))
+                if nouvelle_pomme not in snake and nouvelle_pomme not in pommes:
+                    pommes[index] = nouvelle_pomme
+                    break
         else:
-            snake.pop()
+            snake.pop()  # Sinon on avance
 
-        # Draw
+        # Affichage
         fenetre.fill((243, 232, 238))
         fenetre.blit(font_grande.render("Snake Game", True, couleur_texte_normal), (155, 10))
         fenetre.blit(font_petite.render("Touche DELETE pour revenir au lobby", True, (245, 133, 73)), (155, 40))
         fenetre.blit(font_petite.render(f"Score: {score}", True, couleur_texte_survol), (10, 570))
-
-        # Draw apple
-        pygame.draw.rect(fenetre, (255, 0, 0), (apple[0]*TILE_SIZE, apple[1]*TILE_SIZE, TILE_SIZE, TILE_SIZE))
-
-        # Draw snake
+        # pmmes
+        for pomme in pommes:
+            pygame.draw.rect(fenetre, (255, 0, 0), (pomme[0]*TILE_SIZE, pomme[1]*TILE_SIZE, TILE_SIZE, TILE_SIZE))
+        # snake
         for segment in snake:
             pygame.draw.rect(fenetre, (0, 255, 0), (segment[0]*TILE_SIZE, segment[1]*TILE_SIZE, TILE_SIZE, TILE_SIZE))
 
         pygame.display.update()
         clock.tick(10)
 
-    # Afficher "Game Over"
+    # Affichage Game Over
     fenetre.blit(font_grande.render("Game Over", True, (200, 0, 0)), (320, 250))
     pygame.display.update()
     pygame.time.wait(2000)
     pygame.quit()
     relancer_main()
 
+""" Redémarre le launcher après le jeu"""
 def relancer_main():
     if getattr(sys, 'frozen', False):
         base_path = os.path.dirname(sys.executable)
