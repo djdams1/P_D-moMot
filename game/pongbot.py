@@ -22,13 +22,12 @@ couleur_texte_survol = (34, 87, 122)  # bleu
 WHITE = (47, 6, 1)
 BLACK = (243, 232, 238)
 
-# Vitesse des joueurs et de la balle
-PLAYER_SPEED = 5
-BALL_SPEED = 3
-BOT_REACTION_SPEED = 2  # Vitesse de réaction du bot (très lent)
-BOT_MISSED_CHANCE = 5  # Chance que le bot rate la balle, plus bas = plus de ratés
-BOT_HESITATION = 10  # Chance que le bot hésite (plus bas = plus d'hésitations)
-BOT_RANDOMNESS = 10  # Plus cette valeur est élevée, plus le mouvement du bot sera erratique
+PLAYER_SPEED = 13
+BALL_SPEED = 7
+BOT_REACTION_SPEED = 4  # Vitesse de réaction du bot (très lent)
+BOT_MISSED_CHANCE = 20  # Chance que le bot rate la balle, plus bas = plus de ratés
+BOT_HESITATION = 15  # Chance que le bot hésite (plus bas = plus d'hésitations)
+BOT_RANDOMNESS = 20  # Plus cette valeur est élevée, plus le mouvement du bot sera erratique
 
 # Dimensions des joueurs et de la balle
 PADDLE_WIDTH, PADDLE_HEIGHT = 20, 100
