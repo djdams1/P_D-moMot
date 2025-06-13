@@ -33,7 +33,7 @@ pomme_image = pygame.image.load(os.path.join(base_path, "snake", "pomme.png")).c
 pomme_image = pygame.transform.scale(pomme_image, (TILE_SIZE, TILE_SIZE))
 
 try:
-    serpent_image = pygame.image.load(os.path.join(base_path, "snake", "corps.png")).convert_alpha()
+    serpent_image = pygame.image.load(os.path.join(base_path, "snake", "corps1.png")).convert_alpha()
     serpent_image = pygame.transform.scale(serpent_image, (TILE_SIZE, TILE_SIZE))
     use_serpent_texture = True
 except FileNotFoundError:
@@ -45,7 +45,7 @@ try:
     use_tete_texture = True
 except FileNotFoundError:
     use_tete_texture = False
-
+1
 try:
     keu_image = pygame.image.load(os.path.join(base_path, "snake", "keu.png")).convert_alpha()
     keu_image = pygame.transform.scale(keu_image, (TILE_SIZE, TILE_SIZE))
@@ -59,7 +59,7 @@ except FileNotFoundError:
 def main():
     snake = [(5, 5)]
     direction = (1, 0)
-    pommes = [(random.randint(0, NB_TILES_X - 1), random.randint(0, NB_TILES_Y - 1)) for _ in range(5)]
+    pommes = [(random.randint(0, NB_TILES_X - 1), random.randint(0, NB_TILES_Y - 1)) for _ in range(800)]
     score = 0
     continuer = True
     direction_changed = False

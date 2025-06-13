@@ -21,7 +21,7 @@ from game import snak
 
 # init la fenetre
 pygame.init()
-fenetre = pygame.display.set_mode((640, 500))
+fenetre = pygame.display.set_mode((640, 550))
 pygame.display.set_caption("Lobby Game")
 
 # deffinit les fonts
@@ -44,7 +44,8 @@ textes = [
     "Pendu",
     "BlackJack",
     "Memoir",
-    "Jeux aléatoires"
+    "Jeux aléatoires",
+    "Quitter"
 ]
 
 CHOIX = [
@@ -56,7 +57,8 @@ CHOIX = [
     "Morpion",
     "Pendu",
     "BlackJack",
-    "Memoir"
+    "Memoir",
+    "Quitter"
     ]
 
 # Position de chaque texte
@@ -71,7 +73,8 @@ positions = [
     (120, 280),
     (120, 310),
     (120, 340),
-    (120, 450)
+    (120, 450),
+    (120, 480)
 ]
 
 # varibale de loop
@@ -153,7 +156,7 @@ def main():
                     if texte == "Morpion" or select == 5:
                         
                         pygame.display.set_mode((800, 600))
-                        morpoin.main()  
+                        morpoin.main()                          
                         continuer = False  
 
                     if texte == "Pendu" or select == 6:
@@ -189,6 +192,12 @@ def main():
                         print(select)
                         continuer = True
 
+                    if texte == "Quitter":
+                        continuer = False
+                        pygame.quit()
+                        sys.exit()
+
+
 
         fenetre.blit(font_petite.render("Touche DELETE pour quitter", True, (245, 133, 73)), (120, 40))
 
@@ -199,6 +208,7 @@ def main():
             if event.type == KEYDOWN and event.key == K_DELETE or event.type == pygame.QUIT:
                 continuer = False
                 pygame.quit()
+                sys.exit()
 
 
 """Fonction pour trouver le 'favicon' dans l'exe ou pas"""
