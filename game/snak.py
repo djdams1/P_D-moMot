@@ -33,7 +33,7 @@ pomme_image = pygame.image.load(os.path.join(base_path, "snake", "pomme.png")).c
 pomme_image = pygame.transform.scale(pomme_image, (TILE_SIZE, TILE_SIZE))
 
 try:
-    serpent_image = pygame.image.load(os.path.join(base_path, "snake", "serpent.png")).convert_alpha()
+    serpent_image = pygame.image.load(os.path.join(base_path, "snake", "corps.png")).convert_alpha()
     serpent_image = pygame.transform.scale(serpent_image, (TILE_SIZE, TILE_SIZE))
     use_serpent_texture = True
 except FileNotFoundError:
@@ -46,26 +46,31 @@ try:
 except FileNotFoundError:
     use_tete_texture = False
 
+try:
+    keu_image = pygame.image.load(os.path.join(base_path, "snake", "keu.png")).convert_alpha()
+    keu_image = pygame.transform.scale(keu_image, (TILE_SIZE, TILE_SIZE))
+    use_keu_texture = True
+except FileNotFoundError:
+    use_keu_texture = False
+
+
+# ... tout le début inchangé ...
 
 def main():
     snake = [(5, 5)]
     direction = (1, 0)
-    pommes = [(random.randint(0, NB_TILES_X - 1), random.randint(0, NB_TILES_Y - 1)) for _ in range(1000)]
+    pommes = [(random.randint(0, NB_TILES_X - 1), random.randint(0, NB_TILES_Y - 1)) for _ in range(5)]
     score = 0
     continuer = True
-    direction_changed = False  # Pour éviter de changer plusieurs fois de direction dans le même tick
+    direction_changed = False
 
     while continuer:
         for event in pygame.event.get():
             if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
+                continuer = False
             elif event.type == KEYDOWN and not direction_changed:
                 if event.key == K_DELETE:
                     continuer = False
-                    pygame.quit()
-                    relancer_main()
-                    sys.exit()
                 elif event.key == K_UP and direction != (0, 1):
                     direction = (0, -1)
                     direction_changed = True
@@ -79,9 +84,8 @@ def main():
                     direction = (1, 0)
                     direction_changed = True
 
-        # Déplacement du snake
         head = (snake[0][0] + direction[0], snake[0][1] + direction[1])
-        direction_changed = False  # On autorise un nouveau changement de direction après le mouvement
+        direction_changed = False
 
         if head in snake or head[0] < 0 or head[1] < 0 or head[0] >= NB_TILES_X or head[1] >= NB_TILES_Y:
             continuer = False
@@ -99,6 +103,7 @@ def main():
         else:
             snake.pop()
 
+        # --- DESSIN ---
         fenetre.fill((243, 232, 238))
         fenetre.blit(font_grande.render("Snake Game", True, couleur_texte_normal), (155, 10))
         fenetre.blit(font_petite.render("Touche DELETE pour revenir au lobby", True, (245, 133, 73)), (155, 40))
@@ -107,44 +112,105 @@ def main():
         for pomme in pommes:
             fenetre.blit(pomme_image, (pomme[0]*TILE_SIZE, pomme[1]*TILE_SIZE))
 
-
         for i, segment in enumerate(snake):
             x, y = segment[0] * TILE_SIZE, segment[1] * TILE_SIZE
 
-            if i == 0:  # tête du serpent
+            # Tête
+            if i == 0:
+                if len(snake) > 1:
+                    dir_tete = (snake[0][0] - snake[1][0], snake[0][1] - snake[1][1])
+                else:
+                    dir_tete = direction
+                angle = (get_angle(dir_tete) + 180) % 360
                 if use_tete_texture:
-                    fenetre.blit(tete_image, (x, y))
+                    image = pygame.transform.rotate(tete_image, angle)
+                    fenetre.blit(image, (x, y))
                 elif use_serpent_texture:
-                    fenetre.blit(serpent_image, (x, y))
+                    image = pygame.transform.rotate(serpent_image, angle)
+                    fenetre.blit(image, (x, y))
                 else:
                     pygame.draw.rect(fenetre, (150, 180, 120), (x, y, TILE_SIZE, TILE_SIZE))
-            else:  # corps
+
+            # Queue
+            elif i == len(snake) - 1:
+                if len(snake) > 1:
+                    dir_queue = (snake[-2][0] - snake[-1][0], snake[-2][1] - snake[-1][1])
+                    angle = (get_angle(dir_queue) + 180) % 360
+                else:
+                    angle = 0
+                if use_keu_texture:
+                    image = pygame.transform.rotate(keu_image, angle)
+                    fenetre.blit(image, (x, y))
+                elif use_serpent_texture:
+                    image = pygame.transform.rotate(serpent_image, angle)
+                    fenetre.blit(image, (x, y))
+                else:
+                    pygame.draw.rect(fenetre, (90, 110, 80), (x, y, TILE_SIZE, TILE_SIZE))
+
+            # Corps
+            else:
                 if use_serpent_texture:
-                    fenetre.blit(serpent_image, (x, y))
+                    prev_segment = snake[i - 1]
+                    next_segment = snake[i + 1]
+
+                    dx1 = segment[0] - prev_segment[0]
+                    dy1 = segment[1] - prev_segment[1]
+                    dx2 = next_segment[0] - segment[0]
+                    dy2 = next_segment[1] - segment[1]
+
+                    # Si en ligne droite
+                    if (dx1 == dx2 and dy1 == dy2):
+                        angle = get_angle((dx1, dy1)) + 180
+                        image = pygame.transform.rotate(serpent_image, angle % 360)
+                    else:
+                        # Angle, donc on va afficher le corps tourné pour une courbe
+                        if (dx1, dy1) == (0, -1) and (dx2, dy2) == (1, 0) or (dx1, dy1) == (-1, 0) and (dx2, dy2) == (0, 1):
+                            angle = 0  # haut -> droite ou gauche -> bas
+                        elif (dx1, dy1) == (0, -1) and (dx2, dy2) == (-1, 0) or (dx1, dy1) == (1, 0) and (dx2, dy2) == (0, 1):
+                            angle = 90
+                        elif (dx1, dy1) == (0, 1) and (dx2, dy2) == (-1, 0) or (dx1, dy1) == (1, 0) and (dx2, dy2) == (0, -1):
+                            angle = 180
+                        elif (dx1, dy1) == (0, 1) and (dx2, dy2) == (1, 0) or (dx1, dy1) == (-1, 0) and (dx2, dy2) == (0, -1):
+                            angle = 270
+                        else:
+                            angle = 0  # fallback
+
+                        image = pygame.transform.rotate(serpent_image, angle)
+
+                    fenetre.blit(image, (x, y))
                 else:
                     pygame.draw.rect(fenetre, (109, 118, 91), (x, y, TILE_SIZE, TILE_SIZE))
+
 
 
         pygame.display.update()
         clock.tick(10)
 
+    # Game Over
     fenetre.blit(font_grande.render("Game Over", True, (200, 0, 0)), (320, 250))
     pygame.display.update()
     pygame.time.wait(2000)
     pygame.quit()
+    
     relancer_main()
 
-""" Redémarre le launcher après le jeu"""
-def relancer_main():
-    if getattr(sys, 'frozen', False):
-        base_path = os.path.dirname(sys.executable)
-        main_path = os.path.join(base_path, "main.exe")
-    else:
-        base_path = os.path.dirname(os.path.abspath(__file__))
-        main_path = os.path.abspath(os.path.join(base_path, "..", "main.py"))
+def get_angle(direction):
+    if direction == (1, 0):   # droite
+        return 270
+    elif direction == (-1, 0):  # gauche
+        return 90
+    elif direction == (0, -1):  # haut
+        return 0
+    elif direction == (0, 1):  # bas
+        return 180
+    return 0
 
+
+def relancer_main():
+    base_path = os.path.dirname(sys.executable if getattr(sys, 'frozen', False) else os.path.abspath(__file__))
+    main_path = os.path.join(base_path, "main.exe" if getattr(sys, 'frozen', False) else os.path.abspath(os.path.join(base_path, "..", "main.py")))
     subprocess.run([sys.executable, main_path])
-    sys.exit()
+
 
 if __name__ == "__main__":
     main()
