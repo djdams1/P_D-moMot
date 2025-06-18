@@ -59,13 +59,26 @@ try:
 except FileNotFoundError:
     use_angle_texture = False
 
+try:
+    bg_image = pygame.image.load(os.path.join(base_path, "snake", "bg.jpg")).convert_alpha()
+    bg_image = pygame.transform.scale(bg_image, (TILE_SIZE, TILE_SIZE))
+    use_bg = True
+except FileNotFoundError:
+    use_bg = False
+
+try:
+    bg1_image = pygame.image.load(os.path.join(base_path, "snake", "bg1.jpg")).convert_alpha()
+    bg1_image = pygame.transform.scale(bg1_image, (TILE_SIZE, TILE_SIZE))
+    use_bg1 = True
+except FileNotFoundError:
+    use_bg1 = False
 
 
 # ... tout le début inchangé ...
 
 def main():
     snake = [(5, 5), (4, 5), (3, 5)]
-
+    print(snake)
     direction = (1, 0)
     pommes = [(random.randint(0, NB_TILES_X - 1), random.randint(0, NB_TILES_Y - 1)) for _ in range(10)]
     score = 0
@@ -112,7 +125,19 @@ def main():
             snake.pop()
 
         # --- DESSIN ---
-        fenetre.fill((243, 232, 238))
+        if use_bg and use_bg1:
+            for i in range(NB_TILES_X):
+                for j in range(NB_TILES_Y):
+                    image = bg_image if (i + j) % 2 == 0 else bg1_image
+                    fenetre.blit(image, (i * TILE_SIZE, j * TILE_SIZE))
+        elif use_bg:
+            for i in range(NB_TILES_X):
+                for j in range(NB_TILES_Y):
+                    fenetre.blit(bg_image, (i * TILE_SIZE, j * TILE_SIZE))
+        else:
+            fenetre.fill((240, 240, 240))
+
+
         fenetre.blit(font_grande.render("Snake Game", True, couleur_texte_normal), (155, 10))
         fenetre.blit(font_petite.render("Touche DELETE pour revenir au lobby", True, (245, 133, 73)), (155, 40))
         fenetre.blit(font_petite.render(f"Score: {score}", True, couleur_texte_survol), (10, 570))

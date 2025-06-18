@@ -207,8 +207,10 @@ class Tetris:
             i -= 1
         # Mettre à jour le score
         if lines_cleared > 0:
-            self.score += lines_cleared * 100  # Ajoute 100 points par ligne supprimée
-            print(f"Score increased by {lines_cleared * 100}, total score: {self.score}")
+            points_table = {1: 100, 2: 300, 3: 500, 4: 800}
+            gained = points_table.get(lines_cleared, lines_cleared * 200) 
+            self.score += gained
+            print(f"Score increased by {gained}, total score: {self.score}")
         else:
             print("No lines cleared.")
             

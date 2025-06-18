@@ -52,6 +52,17 @@ def lancer_jeu(index):
     elif index == 10:
         return random.randint(1, 9)
     elif index == 11:
+        fenetre = pygame.display.set_mode((640, 550))
+        fenetre.fill((243, 232, 238))
+
+        texte1 = font_grande.render("Merci d'avoir joué", True, (200, 0, 0))
+        texte2 = font_petite.render("La fenêtre va se fermer", True, (200, 0, 0))
+        fenetre.blit(texte1, (320 - texte1.get_width() // 2, 250))
+        fenetre.blit(texte2, (320 - texte2.get_width() // 2, 285))
+
+        pygame.display.update()  # ← Important pour afficher avant d'attendre
+        pygame.time.wait(3000)
+
         pygame.quit()
         sys.exit()
     return 0  # Reset `select` après
@@ -80,10 +91,16 @@ def main():
         pos_souris = pygame.mouse.get_pos()
         # Juste avant la boucle, ajoute :
         survol_index = None
-        for i, (_, position) in enumerate(zip(textes, positions)):
-            if i != 0 and position[1] <= pos_souris[1] <= position[1] + 30:
+        for i, (texte, position) in enumerate(zip(textes, positions)):
+            if i == 0:
+                continue  # On skip le titre
+            texte_surface = font_grande.render(texte, True, (0, 0, 0))
+            rect = texte_surface.get_rect(topleft=position)
+            if rect.collidepoint(pos_souris):
                 survol_index = i
                 break
+
+
 
         
 
@@ -115,12 +132,12 @@ def main():
                     sys.exit()
                 elif event.key == K_DOWN:
                     index_selection += 1
-                    if index_selection >= len(textes) - 1:
+                    if index_selection >= len(textes) :
                         index_selection = 1
                 elif event.key == K_UP:
                     index_selection -= 1
                     if index_selection < 1:
-                        index_selection = len(textes) - 2
+                        index_selection = len(textes) - 1
                 elif event.key == K_RETURN:
                     select = index_selection
             elif event.type == MOUSEBUTTONDOWN and event.button == 1:
