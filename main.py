@@ -3,91 +3,69 @@
 # Date : 02/06/2025
 # Description : Système de lancement des jeux par interface graphique
 
-# liste d'import
 import pygame
 import os
 import sys
 import random
 from pygame.locals import *
-from game import pongbot
-from game import fpc
-from game import morpoin
-from game import pendu
-from game import blackjack
-from game import tetris
-from game import pong2
-from game import memoir
-from game import snak
+from game import pongbot, fpc, morpoin, pendu, blackjack, tetris, pong2, memoir, snak
 
-# init la fenetre
 pygame.init()
 fenetre = pygame.display.set_mode((640, 550))
 pygame.display.set_caption("Lobby Game")
 
-# deffinit les fonts
 font_grande = pygame.font.SysFont('Century Gothic', 33)
-font_petite = pygame.font.SysFont('Century Gothic', 18)  # Petite police
+font_petite = pygame.font.SysFont('Century Gothic', 18)
 
-# deffinit les couleures 
-couleur_texte_normal = (47, 6, 1)  # noir
-couleur_texte_survol = (34, 87, 122)  # bleu
+couleur_texte_normal = (47, 6, 1)
+couleur_texte_survol = (34, 87, 122)
 
-# Textes
 textes = [
     "Bienvenue dans le lobby",
-    "Shi-Fu-Mi",
-    "Snake",
-    "Pong",
-    "Pong 1V1",
-    "Tetris",
-    "Morpion",
-    "Pendu",
-    "BlackJack",
-    "Memoir",
-    "Jeux aléatoires",
-    "Quitter"
+    "Shi-Fu-Mi", "Snake", "Pong", "Pong 1V1", "Tetris",
+    "Morpion", "Pendu", "BlackJack", "Memoir",
+    "Jeux aléatoires", "Quitter"
 ]
 
-CHOIX = [
-    "Pierre-Papier-Ciseaux",
-    "Snake",
-    "Pong",
-    "Pong1V1",
-    "Tetris",
-    "Morpion",
-    "Pendu",
-    "BlackJack",
-    "Memoir",
-    "Quitter"
-    ]
-
-# Position de chaque texte
 positions = [
-    (120, 10),
-    (120, 100),
-    (120, 130),
-    (120, 160),
-    (120, 190),
-    (120, 220),
-    (120, 250),
-    (120, 280),
-    (120, 310),
-    (120, 340),
-    (120, 450),
-    (120, 480)
+    (120, 10), (120, 100), (120, 130), (120, 160), (120, 190),
+    (120, 220), (120, 250), (120, 280), (120, 310), (120, 340),
+    (120, 450), (120, 480)
 ]
 
-# varibale de loop
+index_selection = 1
 continuer = True
 
-# mette le couleur de fond puis refreche
-fenetre.fill((243, 232, 238))
-pygame.display.flip()
+def lancer_jeu(index):
+    pygame.display.set_mode((800, 600))
+    if index == 1: fpc.main()
+    elif index == 2: snak.main()
+    elif index == 3: pongbot.main()
+    elif index == 4: pong2.main()
+    elif index == 5: tetris.main()
+    elif index == 6: morpoin.main()
+    elif index == 7: pendu.main()
+    elif index == 8: blackjack.main()
+    elif index == 9:
+        pygame.display.set_mode((800, 800))
+        memoir.jeu_memory()
+    elif index == 10:
+        return random.randint(1, 9)
+    elif index == 11:
+        pygame.quit()
+        sys.exit()
+    return 0  # Reset `select` après
 
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
-"""Boucle principale"""
 def main():
-    # essaye de load la favicon
+    global index_selection, continuer
+
     try:
         logo_path = resource_path("textures/logo.png")
         logo = pygame.image.load(logo_path)
@@ -95,133 +73,63 @@ def main():
     except Exception as e:
         print(f"Logo non trouvé ou erreur de chargement : {e}")
 
-    # mets fenetre et continier en global pour etre utiliser dans toutes les methode
-    global fenetre  
-    global continuer
+    select = 0
 
-    select = 0 # varibale de choix aléatoire
-    
-    # boucle du lobby
     while continuer:
         fenetre.fill((243, 232, 238))
-
-        # Récupérer la position de la souris
         pos_souris = pygame.mouse.get_pos()
+        # Juste avant la boucle, ajoute :
+        survol_index = None
+        for i, (_, position) in enumerate(zip(textes, positions)):
+            if i != 0 and position[1] <= pos_souris[1] <= position[1] + 30:
+                survol_index = i
+                break
 
-        # Affichage du texte avec survol
+        
+
         for i, (texte, position) in enumerate(zip(textes, positions)):
-
             if i == 0:
                 couleur_texte = couleur_texte_normal
+            elif i == survol_index:
+                couleur_texte = couleur_texte_survol
+            elif i == index_selection and survol_index is None:
+                couleur_texte = couleur_texte_survol
+
             else:
-                # Créer l'objet texte
-                if position[1] <= pos_souris[1] <= position[1] + 20:
+                couleur_texte = couleur_texte_normal
 
-                    couleur_texte = couleur_texte_survol
-                else:
-                    couleur_texte = couleur_texte_normal
-
-            # Afficher le texte
             fenetre.blit(font_grande.render(texte, True, couleur_texte), position)
 
-            # Séction pour exécuter les mini-jeux en fonction de où est la souris
-            if position[1] <= pos_souris[1] <= position[1] + 20 and couleur_texte == couleur_texte_survol:
-                if pygame.mouse.get_pressed()[0] or select != 0:
-                    
-                    # scondition pour ouvrire chaque jeux
-                    if texte == "Shi-Fu-Mi" or select == 1:
-                        
-                        pygame.display.set_mode((800, 600))
-                        fpc.main() 
-                        continuer = False  
-
-                    if texte == "Snake" or select == 2:
-                        
-                        pygame.display.set_mode((800, 600))
-                        snak.main()  
-                        continuer = False
-
-                    if texte == "Pong" or select == 3:
-                        
-                        pygame.display.set_mode((800, 600))
-                        pongbot.main()  
-                        continuer = False  
-
-                    if texte == "Tetris" or select == 4:
-                        
-                        pygame.display.set_mode((800, 600))
-                        tetris.main()  
-                        continuer = True  
-
-                    if texte == "Morpion" or select == 5:
-                        
-                        pygame.display.set_mode((800, 600))
-                        morpoin.main()                          
-                        continuer = False  
-
-                    if texte == "Pendu" or select == 6:
-                        pygame.display.set_mode((800, 600))
-                        pendu.main()  
-                        continuer = False  
-
-                    if texte == "BlackJack" or select == 7:
-                        
-                        pygame.display.set_mode((800, 600))
-                        blackjack.main()  
-                        
-                        continuer = False  
-
-                    if texte == "Memoir" or select == 8:
-                        
-                        pygame.display.set_mode((800, 800))
-                        memoir.jeu_memory()  
-                        
-                        continuer = False
-
-                    if texte == "Pong 1V1" or select == 9:
-                        
-                        pygame.display.set_mode((800, 600))
-                        pong2.main()  
-                        
-                        continuer = True
-
-                    if texte == "Jeux aléatoires":
-                        
-                        select = random.uniform(0, 9)
-                        select = round(select)
-                        print(select)
-                        continuer = True
-
-                    if texte == "Quitter":
-                        continuer = False
-                        pygame.quit()
-                        sys.exit()
-
-
-
         fenetre.blit(font_petite.render("Touche DELETE pour quitter", True, (245, 133, 73)), (120, 40))
-
         pygame.display.update()
 
-        # Événements pour quitté
         for event in pygame.event.get():
-            if event.type == KEYDOWN and event.key == K_DELETE or event.type == pygame.QUIT:
+            if event.type == QUIT:
                 continuer = False
                 pygame.quit()
                 sys.exit()
+            elif event.type == KEYDOWN:
+                if event.key == K_DELETE:
+                    continuer = False
+                    pygame.quit()
+                    sys.exit()
+                elif event.key == K_DOWN:
+                    index_selection += 1
+                    if index_selection >= len(textes) - 1:
+                        index_selection = 1
+                elif event.key == K_UP:
+                    index_selection -= 1
+                    if index_selection < 1:
+                        index_selection = len(textes) - 2
+                elif event.key == K_RETURN:
+                    select = index_selection
+            elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                for i, (_, position) in enumerate(zip(textes, positions)):
+                    if i != 0 and position[1] <= pos_souris[1] <= position[1] + 30:
+                        select = i
 
-
-"""Fonction pour trouver le 'favicon' dans l'exe ou pas"""
-def resource_path(relative_path):
-    # essaye de créé un dossier temporaire
-    try:
-        # PyInstaller crée un dossier temporaire _MEIPASS
-        base_path = sys._MEIPASS
-    except AttributeError:
-        base_path = os.path.abspath(".")
-
-    return os.path.join(base_path, relative_path)
-
+        if select != 0:
+            select = lancer_jeu(select)
 
 if __name__ == "__main__":
     main()

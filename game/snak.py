@@ -45,21 +45,29 @@ try:
     use_tete_texture = True
 except FileNotFoundError:
     use_tete_texture = False
-1
+
 try:
     keu_image = pygame.image.load(os.path.join(base_path, "snake", "keu.png")).convert_alpha()
     keu_image = pygame.transform.scale(keu_image, (TILE_SIZE, TILE_SIZE))
     use_keu_texture = True
 except FileNotFoundError:
     use_keu_texture = False
+try:
+    serpent_angle_image = pygame.image.load(os.path.join(base_path, "snake", "angle.png")).convert_alpha()
+    serpent_angle_image = pygame.transform.scale(serpent_angle_image, (TILE_SIZE, TILE_SIZE))
+    use_angle_texture = True
+except FileNotFoundError:
+    use_angle_texture = False
+
 
 
 # ... tout le début inchangé ...
 
 def main():
-    snake = [(5, 5)]
+    snake = [(5, 5), (4, 5), (3, 5)]
+
     direction = (1, 0)
-    pommes = [(random.randint(0, NB_TILES_X - 1), random.randint(0, NB_TILES_Y - 1)) for _ in range(800)]
+    pommes = [(random.randint(0, NB_TILES_X - 1), random.randint(0, NB_TILES_Y - 1)) for _ in range(10)]
     score = 0
     continuer = True
     direction_changed = False
@@ -158,26 +166,29 @@ def main():
                     dx2 = next_segment[0] - segment[0]
                     dy2 = next_segment[1] - segment[1]
 
-                    # Si en ligne droite
                     if (dx1 == dx2 and dy1 == dy2):
+                        # Ligne droite
                         angle = get_angle((dx1, dy1)) + 180
                         image = pygame.transform.rotate(serpent_image, angle % 360)
                     else:
-                        # Angle, donc on va afficher le corps tourné pour une courbe
-                        if (dx1, dy1) == (0, -1) and (dx2, dy2) == (1, 0) or (dx1, dy1) == (-1, 0) and (dx2, dy2) == (0, 1):
-                            angle = 0  # haut -> droite ou gauche -> bas
-                        elif (dx1, dy1) == (0, -1) and (dx2, dy2) == (-1, 0) or (dx1, dy1) == (1, 0) and (dx2, dy2) == (0, 1):
-                            angle = 90
-                        elif (dx1, dy1) == (0, 1) and (dx2, dy2) == (-1, 0) or (dx1, dy1) == (1, 0) and (dx2, dy2) == (0, -1):
-                            angle = 180
-                        elif (dx1, dy1) == (0, 1) and (dx2, dy2) == (1, 0) or (dx1, dy1) == (-1, 0) and (dx2, dy2) == (0, -1):
-                            angle = 270
+                        # Angle
+                        if use_angle_texture:
+                            if (dx1, dy1) == (0, -1) and (dx2, dy2) == (1, 0) or (dx1, dy1) == (-1, 0) and (dx2, dy2) == (0, 1):
+                                angle = 0
+                            elif (dx1, dy1) == (0, -1) and (dx2, dy2) == (-1, 0) or (dx1, dy1) == (1, 0) and (dx2, dy2) == (0, 1):
+                                angle = 270
+                            elif (dx1, dy1) == (0, 1) and (dx2, dy2) == (-1, 0) or (dx1, dy1) == (1, 0) and (dx2, dy2) == (0, -1):
+                                angle = 180
+                            elif (dx1, dy1) == (0, 1) and (dx2, dy2) == (1, 0) or (dx1, dy1) == (-1, 0) and (dx2, dy2) == (0, -1):
+                                angle = 90
+                            else:
+                                angle = 0
+                            image = pygame.transform.rotate(serpent_angle_image, angle)
                         else:
-                            angle = 0  # fallback
-
-                        image = pygame.transform.rotate(serpent_image, angle)
+                            image = pygame.transform.rotate(serpent_image, 0)  # fallback
 
                     fenetre.blit(image, (x, y))
+
                 else:
                     pygame.draw.rect(fenetre, (109, 118, 91), (x, y, TILE_SIZE, TILE_SIZE))
 
@@ -187,7 +198,9 @@ def main():
         clock.tick(10)
 
     # Game Over
+    fenetre.fill((243, 232, 238))
     fenetre.blit(font_grande.render("Game Over", True, (200, 0, 0)), (320, 250))
+    fenetre.blit(font_petite.render(f"score {score}", True, (200, 0, 0)), (375, 280))
     pygame.display.update()
     pygame.time.wait(2000)
     pygame.quit()
