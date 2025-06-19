@@ -1,7 +1,7 @@
 # ETML
 # Author : Damien Rochat
 # Date : 02/06/2025
-# Description : Système de lancement des jeux par interface graphique - Snake optimisé
+# Description : Système de lancement des jeux par interface graphique
 
 import pygame
 import sys
@@ -168,8 +168,8 @@ def main():
     direction = (1, 0)
     pommes = []
     score = 0
-    direction_changed = False
     continuer = True
+    input_buffer = []
 
     vitesse_snake = 75  # ms entre déplacements du serpent
     temps_derniere_mise_a_jour = pygame.time.get_ticks()
@@ -184,31 +184,39 @@ def main():
         for event in pygame.event.get():
             if event.type == QUIT:
                 continuer = False
-            elif event.type == KEYDOWN and not direction_changed:
+
+            elif event.type == KEYDOWN:
                 if event.key == K_DELETE:
                     continuer = False
-                keys = pygame.key.get_pressed()
-                if keys[K_UP] and direction != (0, 1):
-                    direction = (0, -1)
-                    direction_changed = True
-                elif keys[K_DOWN] and direction != (0, -1):
-                    direction = (0, 1)
-                    direction_changed = True
-                elif keys[K_LEFT] and direction != (1, 0):
-                    direction = (-1, 0)
-                    direction_changed = True
-                elif keys[K_RIGHT] and direction != (-1, 0):
-                    direction = (1, 0)
-                    direction_changed = True
+
+                new_dir = None
+                if event.key == K_UP:
+                    new_dir = (0, -1)
+                elif event.key == K_DOWN:
+                    new_dir = (0, 1)
+                elif event.key == K_LEFT:
+                    new_dir = (-1, 0)
+                elif event.key == K_RIGHT:
+                    new_dir = (1, 0)
+
+                if new_dir and (len(input_buffer) == 0 or input_buffer[-1] != new_dir):
+                    input_buffer.append(new_dir)
+
 
         # Avancer le serpent uniquement toutes les "vitesse_snake" ms
         temps_courant = pygame.time.get_ticks()
         if temps_courant - temps_derniere_mise_a_jour > vitesse_snake:
             temps_derniere_mise_a_jour = temps_courant
 
+            # Appliquer la prochaine direction si valide
+            while input_buffer:
+                next_dir = input_buffer.pop(0)
+                if (next_dir[0] != -direction[0] or next_dir[1] != -direction[1]):
+                    direction = next_dir
+                    break
+
             # Calcul nouvelle tête
             head = (snake[0][0] + direction[0], snake[0][1] + direction[1])
-            direction_changed = False
 
             # Conditions de fin
             if head in snake or not (0 <= head[0] < NB_TILES_X) or not (0 <= head[1] < NB_TILES_Y):
