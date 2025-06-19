@@ -164,7 +164,7 @@ def relancer_main():
     
     subprocess.run([sys.executable, main_path])
     sys.exit()
-    
+
 def main():
     snake = [(5, 5), (4, 5), (3, 5)]
     direction = (1, 0)
@@ -259,7 +259,7 @@ def main():
         dessiner_snake(snake, direction)
 
         pygame.display.update()
-        clock.tick(60)
+        clock.tick(40)
 
     # Game Over
     fenetre.fill((243, 232, 238))
