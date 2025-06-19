@@ -154,15 +154,17 @@ def dessiner_snake(snake, direction):
                 pygame.draw.rect(fenetre, (109, 118, 91), (x, y, TILE_SIZE, TILE_SIZE))
 
 def relancer_main():
-    """Relance le programme main.py ou main.exe selon le contexte."""
-    base_path = os.path.dirname(sys.executable if getattr(sys, 'frozen', False) else os.path.abspath(__file__))
+    # Détecte si on est dans un .exe (PyInstaller)
     if getattr(sys, 'frozen', False):
-        main_path = os.path.join(base_path, "main.exe")
-        subprocess.run([main_path])
+        base_path = os.path.dirname(sys.executable)
+        main_path = os.path.join(base_path, "main.exe")  # si compilé
     else:
-        main_path = os.path.abspath(os.path.join(base_path, "..", "main.py"))
-        subprocess.run([sys.executable, main_path])
-
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        main_path = os.path.abspath(os.path.join(base_path, "..", "main.py"))  # si .py
+    
+    subprocess.run([sys.executable, main_path])
+    sys.exit()
+    
 def main():
     snake = [(5, 5), (4, 5), (3, 5)]
     direction = (1, 0)
