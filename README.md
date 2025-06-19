@@ -161,4 +161,3 @@ Cela signifie que :
 - 🚫 Utilisation dans des logiciels propriétaires interdite.
 
 🧾 Voir le fichier [LICENSE](./LICENSE) pour la version complète de la licence.
-
