@@ -51,27 +51,28 @@ back_image = pygame.image.load(resource_path("game/cards/back.png"))
 def load_card_images():
     global card_images, back_image
     card_folder = "game/cards"
- 
+
     for value in ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]:
         for suit in ["C", "D", "H", "S"]:
             name = f"{value}-{suit}"
             path = resource_path(os.path.join(card_folder, f"{name}.png"))
             if os.path.isfile(path):
                 img = pygame.image.load(path).convert_alpha()
-                img = pygame.transform.scale(img, (71, 96))
+                img = pygame.transform.smoothscale(img, (100, 135))  # Taille plus grande, qualité améliorée
                 card_images[name] = img
             else:
                 print(f"⚠️ Image manquante : {name}.png")
- 
-    # Charger le dos de carte
+
+    # Dos de carte
     back_path = resource_path(os.path.join(card_folder, "back.png"))
     if os.path.isfile(back_path):
         back_image = pygame.image.load(back_path).convert_alpha()
-        back_image = pygame.transform.scale(back_image, (71, 96))
+        back_image = pygame.transform.smoothscale(back_image, (100, 135))
     else:
         print("⚠️ Aucune image de dos de carte trouvée (back.png)")
-        back_image = pygame.Surface((71, 96))
-        back_image.fill((50, 50, 50))
+        back_image = pygame.Surface((100, 135))
+        back_image.fill((30, 30, 30))
+
  
 load_card_images()
  
@@ -205,15 +206,16 @@ def stay():
  
     # Résultat final
     if yourSum > 21:
-        message = "You Lose!"
+        message = "Vous avez perdu !"
     elif dealerSum > 21 or yourSum > dealerSum:
-        message = "You Win!"
+        message = "Vous avez gagné !"
         yourcash += mise * 2
     elif yourSum == dealerSum:
-        message = "Tie!"
+        message = "Égalité !"
         yourcash += mise
     else:
-        message = "You Lose!"
+        message = "Vous avez perdu !"
+
  
     mise = 0
     game_over = True
@@ -235,25 +237,26 @@ def draw_hand(hand, x, y, reveal_all=True):
  
  
 def draw_screen():
-   
-    fenetre.fill((0, 128, 0))
+    fenetre.fill((0, 100, 0))  # Fond un peu plus foncé vert casino
 
-    fenetre.blit(font_petite.render("H pour piocher, S pour validé et R pour une nouvelle relancer", True, (245, 133, 73)), (50, 10))
+    # Zone de texte avec fond foncé pour bien contraster
+    
+    
+    fenetre.blit(font_petite.render("H pour piocher, S pour valider, R pour nouvelle partie", True, (255, 255, 255)), (50, 10))
 
-    fenetre.blit(font_grande.render(f"Cash: ${yourcash}", True, (255, 255, 255)), (600, 20))
-    fenetre.blit(font_grande.render(f"Bet: ${mise}", True, (255, 255, 255)), (600, 60))
-    fenetre.blit(font_grande.render(f"Your Total: {yourSum}", True, (255, 255, 255)), (50, 350))
- 
-    dealer_text = f"Dealer Total: {'?' if not game_over else dealerSum}"
+    fenetre.blit(font_grande.render(f"Argent: ${yourcash}", True, (255, 255, 255)), (550, 20))
+    fenetre.blit(font_grande.render(f"Mise: ${mise}", True, (255, 255, 255)), (550, 60))
+    fenetre.blit(font_grande.render(f"Votre total: {yourSum}", True, (255, 255, 255)), (50, 350))
+
+    dealer_text = f"Total Croupier: {'?' if not game_over else dealerSum}"
     fenetre.blit(font_grande.render(dealer_text, True, (255, 255, 255)), (50, 50))
- 
+
     draw_hand(dealer_hand + ([hidden_card] if not game_over else []), 50, 100, reveal_all=game_over)
     draw_hand(your_hand, 50, 400)
- 
+
     if game_over:
         fenetre.blit(font_grande.render(message, True, (255, 255, 255)), (300, 250))
-        fenetre.blit(font_petite.render("Appuyez sur R pour recommencer", True, (255, 255, 255)), (300, 300))
-       
+        fenetre.blit(font_petite.render("Appuyez sur R pour nouvelle partie", True, (255, 255, 255)), (300, 300))
 def main():
     global mise, yourcash, nextgame
  

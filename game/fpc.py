@@ -1,147 +1,115 @@
 # ETML
 # Author : Damien Rochat
-# Date : 03/06/2025
-# Description : jeu du Shi-Fu-Mi contre l'ordinateur
+# Date : 19/06/2025
+# Description : Shi-Fu-Mi sans image mais propre et animé
 
-# list d'import
 import pygame
 import sys
 import random
-from pygame.locals import *
-import subprocess
 import os
+import subprocess
 
-# init la fenetre
+# Init
 pygame.init()
-fenetre = pygame.display.set_mode((840, 500))
+WIDTH, HEIGHT = 840, 500
+fenetre = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Shi-Fu-Mi")
 
+# Couleurs
+COUL_FOND = (243, 232, 238)
+COUL_BOUTON = (253, 242, 248)
+COUL_TEXTE = (47, 6, 1)
+COUL_RESULTAT = (47, 6, 1)
 
-"""Boucle principale"""
-def main():
+# Fonts
+font_grande = pygame.font.SysFont('Century Gothic', 40)
+font_moyenne = pygame.font.SysFont('Century Gothic', 28)
+font_petite = pygame.font.SysFont('Century Gothic', 20)
 
-    # deffinit les fonts
-    font_grande = pygame.font.SysFont('Century Gothic', 33)
-    font_petite = pygame.font.SysFont('Century Gothic', 18)  # Petite police
+# Choix
+CHOIX = ["Kayou", "Papier", "Ciseaux"]
+rects = {
+    "Kayou": pygame.Rect(120, 180, 180, 80),
+    "Papier": pygame.Rect(330, 180, 180, 80),
+    "Ciseaux": pygame.Rect(540, 180, 180, 80),
+}
+zone_resultat = pygame.Rect(0, 90, WIDTH, 40)
 
-    # deffinit les couleures 
-    couleur_texte_normal = (47, 6, 1)  # noir
-    couleur_fond = (243, 232, 238)  # bleu
+def afficher_texte_centre(texte, font, couleur, y):
+    surf = font.render(texte, True, couleur)
+    rect = surf.get_rect(center=(WIDTH // 2, y))
+    fenetre.blit(surf, rect)
 
-    CHOIX = ["Kayou", "Papier", "Ciseaux"] #choix dissponible
+def dessiner_interface():
+    fenetre.fill(COUL_FOND)
+    afficher_texte_centre("Shi-Fu-Mi", font_grande, COUL_TEXTE, 40)
+    afficher_texte_centre("Touche DELETE pour quitter", font_petite, COUL_RESULTAT, 70)
 
-    # Positions des boutons
-    rect_pierre = pygame.Rect(155, 150, 80, 80)
-    rect_papier = pygame.Rect(255, 150, 80, 80)
-    rect_ciseaux = pygame.Rect(355, 150, 80, 80)
-    efface_text = pygame.Rect(150, 75, 600, 50)
+    for nom, rect in rects.items():
+        pygame.draw.rect(fenetre, COUL_BOUTON, rect, border_radius=12)
+        texte = font_moyenne.render(nom, True, COUL_TEXTE)
+        texte_rect = texte.get_rect(center=rect.center)
+        fenetre.blit(texte, texte_rect)
 
-    """Dessiner les boutons et texte à chaque lancement"""
-
-    def dessiner_elements():
-        fenetre.fill(couleur_fond)  # Effacer toute la fenêtre avec la couleur de fond
-        pygame.draw.rect(fenetre, couleur_texte_normal, rect_pierre)
-        pygame.draw.rect(fenetre, couleur_texte_normal, rect_papier)
-        pygame.draw.rect(fenetre, couleur_texte_normal, rect_ciseaux)
-
-        fenetre.blit(font_petite.render("Kayou", True, couleur_fond), (170, 180))
-        fenetre.blit(font_petite.render("Papier", True, couleur_fond), (270, 180))
-        fenetre.blit(font_petite.render("Ciseaux", True, couleur_fond), (365, 180))
-
-        fenetre.blit(font_grande.render("Shi-Fu-Mi", True, couleur_texte_normal), (155, 10))
-        fenetre.blit(font_petite.render("Touche DELETE pour revenir au lobby", True, (245, 133, 73)), (155, 40))
-
+def animation_rebours():
+    for chiffre in ["1", "2", "3"]:
+        pygame.draw.rect(fenetre, COUL_FOND, zone_resultat)
+        afficher_texte_centre(chiffre, font_grande, COUL_TEXTE, 110)
         pygame.display.flip()
+        pygame.time.wait(400)
 
-    """Initialiser la fenêtre avec les éléments"""
-    dessiner_elements()
+def afficher_resultat(msg):
+    pygame.draw.rect(fenetre, COUL_FOND, zone_resultat)
+    afficher_texte_centre(msg, font_petite, COUL_RESULTAT, 110)
+    pygame.display.flip()
 
-    continuer = True #variable de loop
+def checkwin(choix_joueur):
+    choix_pc = random.choice(CHOIX)
+    print(f"Vous : {choix_joueur}, AI : {choix_pc}")
 
-    while continuer:   
-        pygame.time.wait(1000)     
-        clic_possible = True  # ← Début : on peut cliquer
+    if choix_joueur == choix_pc:
+        afficher_resultat(f"Égalité ! AI : {choix_pc}")
+    elif (choix_joueur == "Kayou" and choix_pc == "Ciseaux") or \
+         (choix_joueur == "Papier" and choix_pc == "Kayou") or \
+         (choix_joueur == "Ciseaux" and choix_pc == "Papier"):
+        afficher_resultat(f"Gagné ! AI : {choix_pc}")
+    else:
+        afficher_resultat(f"Perdu ! AI : {choix_pc}")
+
+def relancer_main():
+    if getattr(sys, 'frozen', False):
+        path = os.path.join(os.path.dirname(sys.executable), "main.exe")
+    else:
+        path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "main.py"))
+    subprocess.run([sys.executable, path])
+    sys.exit()
+
+def main():
+    continuer = True
+    dessiner_interface()
+    pygame.display.flip()
+
+    while continuer:
         for event in pygame.event.get():
-            if event.type == MOUSEBUTTONDOWN and event.button == 1 and clic_possible:
-                clic_possible = False  # ← Bloque les autres clics
-                pos_souris = pygame.mouse.get_pos()
-                dessiner_elements()
-                
-                if rect_pierre.collidepoint(pos_souris):
-                    choix_humain = "Kayou"
-                elif rect_papier.collidepoint(pos_souris):
-                    choix_humain = "Papier"
-                elif rect_ciseaux.collidepoint(pos_souris):
-                    choix_humain = "Ciseaux"
-                else:
-                    choix_humain = "Miss"
-
-                fenetre.blit(font_grande.render("..." , True, couleur_texte_normal), (155, 80))
-                pygame.display.flip()
-
-                rdmtemps = random.randint(500, 3000)
-                print(rdmtemps)
-                pygame.time.wait(rdmtemps)  # ← Pause d'effet
-
-                dessiner_elements()
-                checkwin(choix_humain, fenetre, couleur_fond, efface_text, CHOIX, couleur_texte_normal, font_grande)
-                
-                
-
-            # Événements pour quitté
-            if event.type == KEYDOWN and event.key == K_DELETE:
-                pygame.quit()
-                relancer_main()
-                sys.exit()
-            elif event.type == pygame.QUIT:
+            if event.type == pygame.QUIT:
                 continuer = False
                 pygame.quit()
                 sys.exit()
 
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_DELETE:
+                    pygame.quit()
+                    relancer_main()
+
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                pos = pygame.mouse.get_pos()
+                for nom, rect in rects.items():
+                    if rect.collidepoint(pos):
+                        animation_rebours()
+                        checkwin(nom)
+                        break
+
         pygame.display.update()
-
-    pygame.quit()
-
-"""Permet de retrouner au lobby sasn bug"""
-def relancer_main():
-    # Détecte si on est dans un .exe (PyInstaller)
-    if getattr(sys, 'frozen', False):
-        base_path = os.path.dirname(sys.executable)
-        main_path = os.path.join(base_path, "main.exe")  # si compilé
-    else:
-        base_path = os.path.dirname(os.path.abspath(__file__))
-        main_path = os.path.abspath(os.path.join(base_path, "..", "main.py"))  # si .py
-    
-    subprocess.run([sys.executable, main_path])
-    sys.exit()
-"""Sert a savoir qui gagne"""
-def checkwin(choix_humain, fenetre, couleur_fond, efface_text, CHOIX, couleur_texte_normal, font_grande):
-    pygame.draw.rect(fenetre, couleur_fond, efface_text)  # Effacer la zone du texte
-
-    choix_pc = random.choice(CHOIX)
-
-    # Debug
-    print("choix Homme :" + choix_humain + " Choix PC :" + choix_pc)
-
-    if (choix_pc == "Kayou" and choix_humain == "Kayou") or \
-            (choix_pc == "Papier" and choix_humain == "Papier") or \
-            (choix_pc == "Ciseaux" and choix_humain == "Ciseaux"):
-        # C'est un match nul
-        fenetre.blit(font_grande.render("Match nul ! l'ordinateur a choisi " + choix_pc, True, couleur_texte_normal), (155, 80))
-
-    elif (choix_pc == "Kayou" and choix_humain == "Papier") or \
-            (choix_pc == "Papier" and choix_humain == "Ciseaux") or \
-            (choix_pc == "Ciseaux" and choix_humain == "Kayou"):
-        # L'humain a gagné
-        fenetre.blit(font_grande.render("Tu as gagné ! l'ordinateur a choisi " + choix_pc, True, couleur_texte_normal), (155, 80))
-
-    elif (choix_pc == "Kayou" and choix_humain == "Ciseaux") or \
-            (choix_pc == "Papier" and choix_humain == "Kayou") or \
-            (choix_pc == "Ciseaux" and choix_humain == "Papier"):
-        # L'ordinateur a gagné
-        fenetre.blit(font_grande.render("L'ordinateur a gagné ! il a choisi " + choix_pc, True, couleur_texte_normal), (155, 80))
-    else:
-        fenetre.blit(font_grande.render("Appuies sur un des choix", True, couleur_texte_normal), (155, 80))
-
 
 if __name__ == "__main__":
     main()

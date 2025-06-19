@@ -38,7 +38,10 @@ continuer = True
 
 def lancer_jeu(index):
     pygame.display.set_mode((800, 600))
-    if index == 1: fpc.main()
+    if index == 1: 
+        pygame.display.set_mode((840,500))
+        fpc.main()
+
     elif index == 2: snak.main()
     elif index == 3: pongbot.main()
     elif index == 4: pong2.main()

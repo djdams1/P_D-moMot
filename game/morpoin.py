@@ -1,7 +1,7 @@
 # ETML
 # Author : Damien Rochat
-# Date : 03/06/2025
-# Description : Morpion avec ou sans bot (case à cocher)
+# Date : 19/06/2025
+# Description : Morpion avec ou sans bot (case à cocher + délai bot)
 
 import pygame
 import sys
@@ -10,7 +10,7 @@ import os
 import random
 from pygame.locals import *
 
-# Initialisation
+# Init
 pygame.init()
 WIDTH, HEIGHT = 800, 600
 fenetre = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -21,19 +21,18 @@ font_grande = pygame.font.SysFont('Century Gothic', 33)
 font_petite = pygame.font.SysFont('Century Gothic', 18)
 COULEUR_TEXTE = (47, 6, 1)
 COULEUR_FOND = (243, 232, 238)
-COULEUR_CASE = (100, 100, 100)
 
 # Grille
-largeur_case = 100
-hauteur_case = 100
+largeur_case, hauteur_case = 100, 100
 epaisseur_ligne = 4
 marge_x = (WIDTH - 3 * largeur_case) // 2
 marge_y = 120
 
-# Checkbox
-checkbox_rect = pygame.Rect(155, 70, 20, 20)
+# Checkbox (centrée)
+checkbox_rect = pygame.Rect(WIDTH // 2 - 150, 70, 20, 20)
 jouer_contre_bot = True
 
+# Fonctions
 def dessiner_grille():
     for i in range(1, 3):
         x = marge_x + i * largeur_case
@@ -72,11 +71,7 @@ def checkwin(plateau):
     return None
 
 def plateau_est_plein(plateau):
-    for ligne in plateau:
-        for case in ligne:
-            if case is None:
-                return False
-    return True
+    return all(case is not None for ligne in plateau for case in ligne)
 
 def bot_joue_O(plateau):
     for ligne in range(3):
@@ -124,13 +119,15 @@ def main():
     gagnant = None
     continuer = True
     temps_fin = 0
+    bot_pending = False
+    bot_start_time = 0
 
     while continuer:
         fenetre.fill(COULEUR_FOND)
-        fenetre.blit(font_grande.render("Morpion", True, COULEUR_TEXTE), (155, 10))
-        fenetre.blit(font_petite.render("Touche DELETE pour revenir au lobby", True, (245, 133, 73)), (155, 40))
+        fenetre.blit(font_grande.render("Morpion", True, COULEUR_TEXTE), (WIDTH // 2 - 70, 10))
+        fenetre.blit(font_petite.render("Touche DELETE pour revenir au lobby", True, (245, 133, 73)), (WIDTH // 2 - 140, 40))
 
-        # Checkbox
+        # Affichage case + texte
         pygame.draw.rect(fenetre, COULEUR_TEXTE, checkbox_rect, 2)
         if jouer_contre_bot:
             pygame.draw.line(fenetre, COULEUR_TEXTE, checkbox_rect.topleft, checkbox_rect.bottomright, 2)
@@ -141,14 +138,22 @@ def main():
         dessiner_symboles(plateau)
 
         if gagnant:
-            if gagnant == "Personne":
-                texte = "Match nul !"
-            else:
-                texte = f"Le joueur {gagnant} a gagné !"
-            fenetre.blit(font_grande.render(texte, True, COULEUR_TEXTE), (155, 520))
+            texte = "Match nul !" if gagnant == "Personne" else f"Le joueur {gagnant} a gagné !"
+            fenetre.blit(font_grande.render(texte, True, COULEUR_TEXTE), (WIDTH // 2 - 150, 520))
             if pygame.time.get_ticks() - temps_fin > 3000:
                 pygame.quit()
                 relancer_main()
+
+        current_time = pygame.time.get_ticks()
+        if bot_pending and current_time - bot_start_time > 1500:
+            if bot_joue_O(plateau):
+                tour += 1
+                gagnant = checkwin(plateau)
+                if gagnant or plateau_est_plein(plateau):
+                    temps_fin = pygame.time.get_ticks()
+                    if not gagnant:
+                        gagnant = "Personne"
+            bot_pending = False
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -157,33 +162,24 @@ def main():
             elif event.type == KEYDOWN and event.key == K_DELETE:
                 pygame.quit()
                 relancer_main()
-            elif event.type == MOUSEBUTTONDOWN:
+            elif event.type == MOUSEBUTTONDOWN and not gagnant:
                 pos = pygame.mouse.get_pos()
-
                 if checkbox_rect.collidepoint(pos) and tour == 0:
                     jouer_contre_bot = not jouer_contre_bot
-
-                if not gagnant:
-                    colonne = (pos[0] - marge_x) // largeur_case
-                    ligne = (pos[1] - marge_y) // hauteur_case
-                    if 0 <= colonne < 3 and 0 <= ligne < 3:
-                        if update_clic(tour, ligne, colonne, plateau):
+                else:
+                    col = (pos[0] - marge_x) // largeur_case
+                    lig = (pos[1] - marge_y) // hauteur_case
+                    if 0 <= col < 3 and 0 <= lig < 3:
+                        if update_clic(tour, lig, col, plateau):
                             tour += 1
                             gagnant = checkwin(plateau)
-                            if gagnant:
+                            if gagnant or plateau_est_plein(plateau):
                                 temps_fin = pygame.time.get_ticks()
-                            elif plateau_est_plein(plateau):
-                                gagnant = "Personne"
-                                temps_fin = pygame.time.get_ticks()
+                                if not gagnant:
+                                    gagnant = "Personne"
                             elif jouer_contre_bot and tour % 2 == 1:
-                                if bot_joue_O(plateau):
-                                    tour += 1
-                                    gagnant = checkwin(plateau)
-                                    if gagnant:
-                                        temps_fin = pygame.time.get_ticks()
-                                    elif plateau_est_plein(plateau):
-                                        gagnant = "Personne"
-                                        temps_fin = pygame.time.get_ticks()
+                                bot_pending = True
+                                bot_start_time = pygame.time.get_ticks()
 
         pygame.display.update()
 

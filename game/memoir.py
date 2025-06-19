@@ -2,6 +2,7 @@
 # Author : Damien Rochat
 # Date : 10/06/2025
 # Description : Jeu du memory avec carte aléatoire
+
 import pygame
 import sys
 import random
@@ -30,7 +31,14 @@ NOIR = (0, 0, 0)
 VERT = (50, 200, 50)
 ROUGE = (200, 50, 50)
 
-# Chargement des images de cartes
+# Création de la fenêtre AVANT le chargement des images
+fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE))
+pygame.display.set_caption("Jeu de Memory")
+
+# Police
+police = pygame.font.SysFont(None, 36)
+
+# Fonction pour récupérer le chemin absolu relatif au script/exe
 def chemin_absolu_relatif(relatif):
     if getattr(sys, 'frozen', False):
         base_path = sys._MEIPASS
@@ -38,6 +46,7 @@ def chemin_absolu_relatif(relatif):
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relatif)
 
+# Chargement des images de cartes
 chemin_cartes = chemin_absolu_relatif("game/cards")
 
 if not os.path.exists(chemin_cartes):
@@ -45,14 +54,14 @@ if not os.path.exists(chemin_cartes):
 
 cartes_faces = [f for f in os.listdir(chemin_cartes) if f.endswith(".png") and f.upper() != "BACK.PNG"]
 
-# Sélection aléatoire de 12 cartes, puis duplication pour faire les paires
+# Sélection aléatoire de 12 cartes puis duplication pour faire les paires
 cartes_faces = random.sample(cartes_faces, 12)
 cartes_faces *= 2
 random.shuffle(cartes_faces)
 
 cartes = []
 for i, nom in enumerate(cartes_faces):
-    image = pygame.image.load(os.path.join(chemin_cartes, nom))
+    image = pygame.image.load(os.path.join(chemin_cartes, nom)).convert_alpha()
     image = pygame.transform.scale(image, TAILLE_CARTE)
     cartes.append({
         "nom": nom,
@@ -68,16 +77,9 @@ for i, nom in enumerate(cartes_faces):
         "animation_type": None  # "retourner" ou "cacher"
     })
 
-# Dos de carte
-back_image = pygame.image.load(os.path.join(chemin_cartes, "BACK.png"))
+# Chargement du dos de carte (back.png)
+back_image = pygame.image.load(os.path.join(chemin_cartes, "BACK.png")).convert_alpha()
 back_image = pygame.transform.scale(back_image, TAILLE_CARTE)
-
-# Fenêtre
-fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE))
-pygame.display.set_caption("Jeu de Memory")
-
-# Police
-police = pygame.font.SysFont(None, 36)
 
 def dessiner_carte_animee(carte, temps_actuel):
     """Dessine une carte avec animation de retournement"""
@@ -102,32 +104,25 @@ def dessiner_carte_animee(carte, temps_actuel):
             fenetre.blit(back_image, carte["rect"])
         return
     
-    # Calcul de l'effet de rotation (effet de retournement)
-    # On fait une rotation de 0° à 180° puis de 180° à 360°
+    # Calcul de l'effet de rotation (effet 3D de retournement)
     angle = progression * math.pi  # 0 à π radians
     
-    # Largeur de la carte selon l'angle (effet 3D)
+    # Largeur de la carte selon l'angle
     largeur_originale = TAILLE_CARTE[0]
     largeur_actuelle = int(abs(math.cos(angle)) * largeur_originale)
-    
-    # Éviter une largeur de 0
     if largeur_actuelle < 1:
         largeur_actuelle = 1
     
-    # Déterminer quelle image afficher
-    if angle < math.pi / 2:  # Première moitié : on voit encore l'image actuelle
+    # Quelle image afficher selon la phase de l'animation
+    if angle < math.pi / 2:  # Première moitié de l'animation
         if carte["animation_type"] == "retourner":
-            # On retourne vers la face
             image_a_afficher = back_image if not carte["visible"] else carte["image"]
         else:  # "cacher"
-            # On retourne vers le dos
             image_a_afficher = carte["image"] if carte["visible"] else back_image
-    else:  # Deuxième moitié : on voit la nouvelle image
+    else:  # Deuxième moitié
         if carte["animation_type"] == "retourner":
-            # On retourne vers la face
             image_a_afficher = carte["image"] if carte["visible"] else back_image
         else:  # "cacher"
-            # On retourne vers le dos
             image_a_afficher = back_image if not carte["visible"] else carte["image"]
     
     # Redimensionner l'image selon la largeur calculée
@@ -137,7 +132,6 @@ def dessiner_carte_animee(carte, temps_actuel):
     x_centre = carte["rect"].centerx - largeur_actuelle // 2
     y_centre = carte["rect"].centery - TAILLE_CARTE[1] // 2
     
-    # Afficher l'image animée
     fenetre.blit(image_redimensionnee, (x_centre, y_centre))
 
 def afficher_cartes(temps_actuel):
@@ -180,17 +174,14 @@ def relancer_main():
     sys.exit()
 
 def demarrer_animation_retourner(carte, temps_actuel):
-    """Démarre l'animation de retournement d'une carte"""
     carte["animation_debut"] = temps_actuel
     carte["animation_type"] = "retourner"
 
 def demarrer_animation_cacher(carte, temps_actuel):
-    """Démarre l'animation pour cacher une carte"""
     carte["animation_debut"] = temps_actuel
     carte["animation_type"] = "cacher"
 
 def animation_en_cours():
-    """Vérifie si une animation est en cours"""
     return any(carte["animation_type"] is not None for carte in cartes)
 
 def jeu_memory():
@@ -215,7 +206,6 @@ def jeu_memory():
         afficher_infos(score, temps_restant)
         pygame.display.flip()
 
-        # Gestion de l'attente après deux cartes non-matching
         if attente and temps_actuel >= temps_attente and not animation_en_cours():
             for carte in cartes:
                 if not carte["trouvee"] and carte["visible"]:
@@ -258,7 +248,7 @@ def jeu_memory():
             afficher_fin(True, temps_restant)
             return
 
-        horloge.tick(60)  # Augmenté à 60 FPS pour des animations plus fluides
+        horloge.tick(60)
 
 if __name__ == "__main__":
     jeu_memory()

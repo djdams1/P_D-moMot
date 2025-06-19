@@ -16,7 +16,7 @@ pygame.init()
 
 # Polices et couleurs
 font_grande = pygame.font.SysFont('Century Gothic', 48)
-font_moyenne = pygame.font.SysFont('Century Gothic', 36)
+font_moyenne = pygame.font.SysFont('Century Gothic', 30)
 font_petite = pygame.font.SysFont('Century Gothic', 18)
 couleur_texte_normal = (47, 6, 1)
 couleur_texte_survol = (34, 87, 122)
@@ -126,35 +126,54 @@ def main():
 
     lettres_trouvees = set()
     lettres_ratees = set()
-    max_erreurs = 9
     nb_erreurs = 0
 
     continuer = True
     message_fin = None
+
+   
+                     
+  # Ajoute ça dans main()
+
+    retry_rect = pygame.Rect(310, 380, 180, 50)  # bouton centré
+
+    def reset_game():
+        nonlocal mot, lettres_trouvees, lettres_ratees, nb_erreurs, message_fin
+        mot = get_random_french_word_local()
+        lettres_trouvees = set()
+        lettres_ratees = set()
+        nb_erreurs = 0
+        message_fin = None
 
     while continuer:
         fenetre.fill(couleur_fond)
 
         # Titres
         fenetre.blit(font_grande.render("Pendu", True, couleur_texte_normal), (155, 10))
-        fenetre.blit(font_petite.render("Touche DELETE pour revenir au lobby", True, (245, 133, 73)), (155, 50))
+        fenetre.blit(font_petite.render("Touche DELETE pour revenir au lobby", True, (245, 133, 73)), (155, 80))
 
-        # Afficher mot caché
+        # Mot caché
         mot_cache = afficher_mot_cache(mot, lettres_trouvees)
         texte_mot = font_moyenne.render(mot_cache, True, couleur_texte_normal)
         fenetre.blit(texte_mot, (155, 150))
 
-        # Afficher lettres ratées
+        # Lettres ratées
         texte_erreurs = font_petite.render("Lettres ratées : " + " ".join(sorted(lettres_ratees)), True, (255, 0, 0))
         fenetre.blit(texte_erreurs, (155, 200))
 
-        # Dessiner le pendu selon erreurs
+        # Dessin
         dessiner_pendu(nb_erreurs)
 
-        # Si partie terminée, afficher message
+        # Fin de partie
         if message_fin:
-            texte_fin = font_grande.render(message_fin, True, (200, 0, 0))
+            texte_fin = font_moyenne.render(message_fin, True, (200, 0, 0))
             fenetre.blit(texte_fin, (155, 300))
+
+            # Bouton Retry
+            pygame.draw.rect(fenetre, (200, 200, 200), retry_rect)
+            pygame.draw.rect(fenetre, couleur_texte_normal, retry_rect, 2)
+            texte_retry = font_petite.render("Réessayer", True, couleur_texte_normal)
+            fenetre.blit(texte_retry, (retry_rect.x + 35, retry_rect.y + 15))
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -166,48 +185,28 @@ def main():
                     relancer_main()
                     sys.exit()
 
-                # Si partie en cours et une lettre (a-z)
                 if message_fin is None:
                     if event.unicode.isalpha() and len(event.unicode) == 1:
                         lettre = event.unicode.lower()
                         if lettre in lettres_trouvees or lettre in lettres_ratees:
-                            # lettre déjà proposée, ignore
                             pass
                         elif lettre in mot:
                             lettres_trouvees.add(lettre)
-                            # Victoire ?
                             if all(l in lettres_trouvees for l in mot):
                                 message_fin = "Bravo, vous avez gagné !"
-                                # Redessine le mot complet avant de quitter
-                                fenetre.fill(couleur_fond)
-                                fenetre.blit(font_grande.render("Pendu", True, couleur_texte_normal), (155, 10))
-                                mot_cache = afficher_mot_cache(mot, lettres_trouvees)
-                                texte_mot = font_moyenne.render(mot_cache, True, couleur_texte_normal)
-                                fenetre.blit(texte_mot, (155, 150))
-                                dessiner_pendu(nb_erreurs)
-                                pygame.display.update()
-                                pygame.time.wait(500)  # petite pause pour que ça se voie
-                                stopgame(message_fin)
-
-                        elif lettre not in mot:
+                        else:
                             lettres_ratees.add(lettre)
                             nb_erreurs += 1
-                            if nb_erreurs >= max_erreurs:
-                                lettres_trouvees.update(set(mot))  # Pour afficher le mot entier
+                            if nb_erreurs >= 9:
+                                lettres_trouvees.update(set(mot))
                                 message_fin = f"Perdu ! Le mot était : {mot}"
-                                fenetre.fill(couleur_fond)
-                                fenetre.blit(font_moyenne.render("Pendu", True, couleur_texte_normal), (155, 10))
-                                mot_cache = afficher_mot_cache(mot, lettres_trouvees)
-                                texte_mot = font_moyenne.render(mot_cache, True, couleur_texte_normal)
-                                fenetre.blit(texte_mot, (155, 150))
-                                dessiner_pendu(nb_erreurs)
-                                pygame.display.update()
-                                pygame.time.wait(500)  # petite pause pour bien voir le pendu complet
-                                stopgame(message_fin)
 
+            elif event.type == MOUSEBUTTONDOWN:
+                if message_fin and retry_rect.collidepoint(event.pos):
+                    reset_game()
 
-                                
-                                
+        pygame.display.update()
+                              
 
         pygame.display.update()
 
