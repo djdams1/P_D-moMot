@@ -25,7 +25,7 @@
 ## 📁 Structure du projet
 
 
-
+```bash
 P_Dmot/
 ├── __pycache__/
 │   └── main.cpython-311.pyc
@@ -117,7 +117,7 @@ P_Dmot/
 ├── main.py
 ├── README.md
 └── task.md
-
+```
 
 bash
 Copier
@@ -130,16 +130,15 @@ Modifier
 ```bash
 git clone https://github.com/djdams1/P_D-moMot.git
 cd P_D-moMot
+```
 2. Installer les dépendances
-bash
-Copier
-Modifier
+```bash
 pip install pygame
+```
 3. Lancer le jeu
-bash
-Copier
-Modifier
+```bash
 python main.py
+```
 🧠 TODO
 Optimiser le lobby
 
