@@ -108,7 +108,10 @@ class Tetris:
         self.fall_speed = 500  # Temps avant que la pièce tombe
         self.last_fall_time = pygame.time.get_ticks()
         self.last_move_time = pygame.time.get_ticks()  # Temps pour gérer la répétition des actions
-        self.repeat_rate = 60  # Temps avant qu'une action répétée soit exécutée
+        self.repeat_rate = 70  # Déplacement latéral
+        self.rotate_repeat_rate = 140  # Rotation
+        self.last_rotate_time = pygame.time.get_ticks()
+        self.rotate_pressed = False
         self.move_left_pressed = False
         self.move_right_pressed = False
         self.move_down_pressed = False
@@ -148,8 +151,15 @@ class Tetris:
 
     def rotate_piece(self):
         rotated = [list(row) for row in zip(*self.current_piece[::-1])]
-        if self.valid_position(rotated, self.current_position):
-            self.current_piece = rotated
+        pos = self.current_position[:]
+        
+        # Essayer un léger ajustement latéral si ça sort du plateau
+        for dx in [0, -1, 1, -2, 2]:
+            new_pos = [pos[0], pos[1] + dx]
+            if self.valid_position(rotated, new_pos):
+                self.current_piece = rotated
+                self.current_position = new_pos
+                return
 
     def valid_position(self, piece, pos):
         for y, row in enumerate(piece):
@@ -232,6 +242,8 @@ class Tetris:
 
     def handle_input(self):
         current_time = pygame.time.get_ticks()
+
+        # Gestion des déplacements latéraux et vers le bas
         if current_time - self.last_move_time >= self.repeat_rate:
             if self.move_left_pressed:
                 self.move_left()
@@ -241,12 +253,23 @@ class Tetris:
                 self.move_down()
             self.last_move_time = current_time
 
-            # Vérifie que la position reste valide
-            if not self.valid_position(self.current_piece, self.current_position):
-                self.game_over = True
+        # Gestion de la rotation avec fréquence séparée
+        if self.rotate_pressed and current_time - self.last_rotate_time >= self.rotate_repeat_rate:
+            self.rotate_piece()
+            self.last_rotate_time = current_time
+
+        # Vérifie la validité de la position après mouvement
+        if not self.valid_position(self.current_piece, self.current_position):
+            self.game_over = True
+
 
     def draw(self, screen):
-        # Dessiner la partie gauche (jeu)
+
+        for x in range(11):
+            pygame.draw.line(screen, (40, 40, 40), (x * BLOCK_SIZE, 0), (x * BLOCK_SIZE, SCREEN_HEIGHT))
+        for y in range(21):
+            pygame.draw.line(screen, (40, 40, 40), (0, y * BLOCK_SIZE), (10 * BLOCK_SIZE, y * BLOCK_SIZE))
+
         for y, row in enumerate(self.board):
             for x, cell in enumerate(row):
                 if cell is not None:
@@ -289,7 +312,10 @@ class Tetris:
 
     def update(self):
         current_time = pygame.time.get_ticks()
-        if current_time - self.last_fall_time >= self.fall_speed:
+        # Accélération dynamique
+        speed = max(100, self.fall_speed - self.score // 10)
+        if current_time - self.last_fall_time >= speed:
+
             self.move_down()
             self.last_fall_time = current_time
 
@@ -340,6 +366,11 @@ def main():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     return  # Quitter le jeu
+                if event.type == KEYDOWN and event.key == K_DELETE:
+                    continuer = False
+                    pygame.quit()
+                    relancer_main()
+                    sys.exit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
                         tetris.move_left_pressed = True
@@ -348,7 +379,9 @@ def main():
                     elif event.key == pygame.K_DOWN:
                         tetris.move_down_pressed = True
                     elif event.key == pygame.K_UP:
+                        tetris.rotate_pressed = True
                         tetris.rotate_piece()
+                        tetris.last_rotate_time = pygame.time.get_ticks()
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT:
                         tetris.move_left_pressed = False
@@ -356,6 +389,9 @@ def main():
                         tetris.move_right_pressed = False
                     elif event.key == pygame.K_DOWN:
                         tetris.move_down_pressed = False
+                    elif event.key == pygame.K_UP:
+                        tetris.rotate_pressed = False
+
 
             # Gestion des déplacements automatiques
             tetris.update()
