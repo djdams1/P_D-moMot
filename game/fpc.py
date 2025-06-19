@@ -13,7 +13,7 @@ import os
 
 # init la fenetre
 pygame.init()
-fenetre = pygame.display.set_mode((640, 500))
+fenetre = pygame.display.set_mode((840, 500))
 
 
 """Boucle principale"""
@@ -27,12 +27,12 @@ def main():
     couleur_texte_normal = (47, 6, 1)  # noir
     couleur_fond = (243, 232, 238)  # bleu
 
-    CHOIX = ["Pierre", "Papier", "Ciseaux"] #choix dissponible
+    CHOIX = ["Kayou", "Papier", "Ciseaux"] #choix dissponible
 
     # Positions des boutons
-    rect_pierre = pygame.Rect(155, 150, 70, 70)
-    rect_papier = pygame.Rect(255, 150, 70, 70)
-    rect_ciseaux = pygame.Rect(355, 150, 70, 70)
+    rect_pierre = pygame.Rect(155, 150, 80, 80)
+    rect_papier = pygame.Rect(255, 150, 80, 80)
+    rect_ciseaux = pygame.Rect(355, 150, 80, 80)
     efface_text = pygame.Rect(150, 75, 600, 50)
 
     """Dessiner les boutons et texte à chaque lancement"""
@@ -43,7 +43,7 @@ def main():
         pygame.draw.rect(fenetre, couleur_texte_normal, rect_papier)
         pygame.draw.rect(fenetre, couleur_texte_normal, rect_ciseaux)
 
-        fenetre.blit(font_petite.render("Pierre", True, couleur_fond), (170, 180))
+        fenetre.blit(font_petite.render("Kayou", True, couleur_fond), (170, 180))
         fenetre.blit(font_petite.render("Papier", True, couleur_fond), (270, 180))
         fenetre.blit(font_petite.render("Ciseaux", True, couleur_fond), (365, 180))
 
@@ -57,23 +57,35 @@ def main():
 
     continuer = True #variable de loop
 
-    while continuer:
-
-        # detection du clic
+    while continuer:   
+        pygame.time.wait(1000)     
+        clic_possible = True  # ← Début : on peut cliquer
         for event in pygame.event.get():
-            if event.type == MOUSEBUTTONDOWN and event.button == 1:  # Clic gauche de la souris
+            if event.type == MOUSEBUTTONDOWN and event.button == 1 and clic_possible:
+                clic_possible = False  # ← Bloque les autres clics
                 pos_souris = pygame.mouse.get_pos()
-
+                dessiner_elements()
+                
                 if rect_pierre.collidepoint(pos_souris):
-                    choix_humain = "Pierre"
+                    choix_humain = "Kayou"
                 elif rect_papier.collidepoint(pos_souris):
                     choix_humain = "Papier"
                 elif rect_ciseaux.collidepoint(pos_souris):
                     choix_humain = "Ciseaux"
                 else:
-                    choix_humain ="Miss"
-                # appelle CheckWin
+                    choix_humain = "Miss"
+
+                fenetre.blit(font_grande.render("..." , True, couleur_texte_normal), (155, 80))
+                pygame.display.flip()
+
+                rdmtemps = random.randint(500, 3000)
+                print(rdmtemps)
+                pygame.time.wait(rdmtemps)  # ← Pause d'effet
+
+                dessiner_elements()
                 checkwin(choix_humain, fenetre, couleur_fond, efface_text, CHOIX, couleur_texte_normal, font_grande)
+                
+                
 
             # Événements pour quitté
             if event.type == KEYDOWN and event.key == K_DELETE:
@@ -110,20 +122,20 @@ def checkwin(choix_humain, fenetre, couleur_fond, efface_text, CHOIX, couleur_te
     # Debug
     print("choix Homme :" + choix_humain + " Choix PC :" + choix_pc)
 
-    if (choix_pc == "Pierre" and choix_humain == "Pierre") or \
+    if (choix_pc == "Kayou" and choix_humain == "Kayou") or \
             (choix_pc == "Papier" and choix_humain == "Papier") or \
             (choix_pc == "Ciseaux" and choix_humain == "Ciseaux"):
         # C'est un match nul
         fenetre.blit(font_grande.render("Match nul ! l'ordinateur a choisi " + choix_pc, True, couleur_texte_normal), (155, 80))
 
-    elif (choix_pc == "Pierre" and choix_humain == "Papier") or \
+    elif (choix_pc == "Kayou" and choix_humain == "Papier") or \
             (choix_pc == "Papier" and choix_humain == "Ciseaux") or \
-            (choix_pc == "Ciseaux" and choix_humain == "Pierre"):
+            (choix_pc == "Ciseaux" and choix_humain == "Kayou"):
         # L'humain a gagné
         fenetre.blit(font_grande.render("Tu as gagné ! l'ordinateur a choisi " + choix_pc, True, couleur_texte_normal), (155, 80))
 
-    elif (choix_pc == "Pierre" and choix_humain == "Ciseaux") or \
-            (choix_pc == "Papier" and choix_humain == "Pierre") or \
+    elif (choix_pc == "Kayou" and choix_humain == "Ciseaux") or \
+            (choix_pc == "Papier" and choix_humain == "Kayou") or \
             (choix_pc == "Ciseaux" and choix_humain == "Papier"):
         # L'ordinateur a gagné
         fenetre.blit(font_grande.render("L'ordinateur a gagné ! il a choisi " + choix_pc, True, couleur_texte_normal), (155, 80))
