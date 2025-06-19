@@ -151,5 +151,14 @@ Sauvegarder les scores
 🤝 Contribuer
 Fork le repo, crée ta branche (git checkout -b feat/ma-fonctionnalité), code, push et propose une Pull Request.
 
-📄 Licence
-Ce projet est sous licence MIT.
+## 📄 Licence
+
+Ce projet est protégé par la **GNU General Public License v3.0**.
+
+Cela signifie que :
+- ✅ Vous pouvez copier, modifier, redistribuer le code...
+- ❗️ ...à condition que toute version dérivée soit aussi libre (même licence).
+- 🚫 Utilisation dans des logiciels propriétaires interdite.
+
+🧾 Voir le fichier [LICENSE](./LICENSE) pour la version complète de la licence.
+
